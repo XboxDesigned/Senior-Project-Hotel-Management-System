@@ -221,7 +221,9 @@ INSERT INTO reservations (confirmation_num, guest_id, room_num, check_in_date, c
 ('CNF1002', 2, 201, '2025-02-01', '2025-02-05', 4, 'checked-in', 640.00),
 ('CNF1003', 3, 301, '2025-01-20', '2025-01-22', 2, 'cancelled', 0.00),
 ('CNF1004', 4, 401, '2025-03-05', '2025-03-10', 5, 'confirmed', 800.00),
-('CNF1005', 5, 501, '2025-01-15', '2025-01-20', 5, 'checked-out', 0.00);
+('CNF1005', 5, 501, '2025-01-15', '2025-01-20', 5, 'checked-out', 0.00),
+('CNF1006', 5, 601, '2025-02-05', '2025-02-08', 3, 'confirmed', 500.00),
+('CNF1007', 5, 701, '2025-03-18', '2025-03-24', 6, 'checked-in', 900.00);
 
 -- Insert sample housekeeping tasks 
 INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status) VALUES
