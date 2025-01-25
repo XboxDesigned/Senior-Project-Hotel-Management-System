@@ -1,5 +1,5 @@
 <?php
-require_once 'Website/inc/db_connect.php';
+require_once '../Website/inc/db_connect.php';
 
 // Check if the user is already logged in
 $status = session_status();
@@ -10,6 +10,9 @@ if (isset($_SESSION['user'])) {
     header('Location: index.php'); // Redirect to the home page if already logged in
     exit();
 }
+
+//Initialize error msg
+$error_message = '';
 
 // Check if the login form was submitted
 if (isset($_POST['login'])) {
@@ -39,44 +42,31 @@ if (isset($_POST['login'])) {
             header('Location: homepage/homepage.php');
             exit();
         } else {
-            $error_message = 'Invalid login credentials';
+            $error_message = 'Invalid Username or Password.';
         }
     } else {
-        $error_message = 'Invalid login credentials';
+        $error_message = 'Invalid Username or Password.';
     }
 }
 ?>
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" type="text/css" href="main.css">
 </head>
-
 <body>
-    <h2>Login</h2>
-    <?php if (!empty($error_message)){ ?>
+	<img src="./images/hilton_logo.jpg" alt="hilton-img" class="hilton-logo">
+	<div class="input-container">
+		<?php if (!empty($error_message)){ ?>
 			<p class="error"><?php echo $error_message; ?></p>
 		<?php } ?>
     <form action="" method="POST">
-        <div id="data">
-			<table>
-				<tr>
-					<th> <label>Username:</label> </th>
-					<th> <input type="username" name="username"required></th>
-					<br>
-				</tr>
-				<tr> 
-					<th> <label>Password:</label> </th>
-					<th><input type="password" name="password" required> </th>
-				</tr>
-				<br>
-				<tr>
-					<th> <div id="buttons"> </th>
-					<label>&nbsp;</label>
-					<th><input type="submit" name= "login" value="Log In"><br></th>
-					</div>
-				</tr>
-				
-			</table>
-	    </form>
-        <button><a class="login-logout" href="registerForm.php">Register</a></button>
+	<h2>Login</h2>
+		<input type="username" name="username" class="box" placeholder="Enter Username:" ><br>
+		<input type="password" name="password" class="box" placeholder="Enter Password:" ><br>
+		<label>&nbsp;</label>
+		<button type="submit" name="login" id="submit" class="login-register-btn">LOGIN</button><br>
+		<h3>Don't have an account? <a href="register.php" class="register-link">Create Account</a></h3>
+	</form>
+	</div>
 </body>
