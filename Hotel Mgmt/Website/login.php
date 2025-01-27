@@ -52,7 +52,7 @@ if (isset($_POST['login'])) {
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="main.css">
+<link rel="stylesheet" type="text/css" href="inc/main.css">
 </head>
 <body>
 	<img src="./images/hilton_logo.jpg" alt="hilton-img" class="hilton-logo">
