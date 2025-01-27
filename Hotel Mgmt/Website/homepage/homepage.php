@@ -19,24 +19,22 @@ if (isset($_POST['logout'])) {
     exit();
 }
 
-// Action handling logic
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $action = $_POST['action'];
+	$role = $_SESSION['user']['role'];
 
-    switch ($action) {
+    switch ($role) {
         case 'front_desk':
-            include_once('user_types/frontdesk_login.php');
+            include_once('Homepage-Type/Front-Desk/frontdesk_homepage.php');
             break;
         case 'admin':
-            include_once('user_types/admin_login.php');
+            include_once('Homepage-Type/Admin/admin_homepage.php');
             break;
-        case 'housekeeping':
-            include_once('user_types/housekeeping_login.php');
+        case 'maintenance':
+            include_once('Homepage-Type/Housekeeping-Maintenance/housekeeping_homepage.php');
             break;
         default:
             echo "Invalid action!";
     }
-}
+	
 ?>
 <!DOCTYPE html>
 <html>
