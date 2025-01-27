@@ -36,7 +36,7 @@ if (isset($_POST['login'])) {
             // Successful login
 			echo 'itwork';
             $_SESSION['user'] = array(
-                'user_id' => $user['user_id'],
+                'user_id' => $user['u_id'],
                 'role' => $user['role']
             );
             header('Location: homepage/homepage.php');
