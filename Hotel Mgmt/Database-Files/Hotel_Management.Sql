@@ -58,7 +58,7 @@ CREATE TABLE housekeeping_tasks (
 -- Insert user
 INSERT INTO users (username, password, role) VALUES 
 ('Nicholas Frischkorn', 'hashed_password', 'admin'),
-('Mark Feick', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'admin'),
+('Mark Feick', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'admin'), -- hashed password is "admin"
 ('Lyubomir Dimitrov', 'hashed_password', 'admin'),
 ('Skyler Dipofi', 'hashed_password', 'admin'),
 ('Michael Anderson', 'hashed_password', 'admin'),
@@ -68,7 +68,8 @@ INSERT INTO users (username, password, role) VALUES
 ('James Goober', 'hashed_password', 'housekeeper'),
 ('Admin', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'admin'),
 ('Maintenance', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'maintenance'),
-('Housekeeper', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'housekeeper');
+('Front_Desk', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'front_desk');
+
 
 
 -- Insert  guests
