@@ -4,6 +4,21 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+if (!isset($_SESSION['user'])) {
+    header('Location: ../login.php'); // Redirect to the login if not logged in
+    exit();
+}
+
+// Check if the logout button is clicked
+if (isset($_POST['logout'])) {
+    // Destroy the session
+    session_destroy();
+
+    // Redirect the user to the login page
+    header("Location: ../login.php");
+    exit();
+}
+
 // Action handling logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -34,7 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <h3>What would you like to do today?</h3>
     <br>
 
-    <button><a class="login-logout" href="user_types/logout.php">Logout</a></button>
+    <!-- Logout Button -->
+    <form method="post">
+        <button type="submit" name="logout">Logout</button>
+    </form>
+
     <br>
 </body>
 </html>
