@@ -28,19 +28,22 @@ if (isset($_POST['logout']))
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Home Page</title>
-    <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
-</head>
-<body>
-	<h1>Hello, <?php echo htmlspecialchars($name); ?></h1>
-    <h3>Home</h3>
-    <br>
+	<header>
+		<title>Home Page</title>
+		<link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
+	</head>
+	<body>
+		<h2>Hello, <?php echo htmlspecialchars($name); ?></h2>
 
-    <!-- Logout Button -->
-    <form method="post">
-		<button type="submit" name="logout" id="submit" class="login-register-btn">LOGOUT</button><br>
-    </form>
+		<!-- Logout Button -->
+		<form method="post">
+			<button type="submit" name="logout" id="submit" class="logout-register-btn">LOGOUT</button><br>
+		</form>
 
+	</header>
+	
+	<h1>Home</h1>
+	
     <br>
 </body>
 </html>
