@@ -22,7 +22,7 @@ if (isset($_POST['login'])) {
 	//var_dump($user);
     //var_dump($password);
     // Query the database to check if the provided user exists and matches the password
-    $query = 'SELECT u_id, password, role
+    $query = 'SELECT u_id, password, role, username
                 FROM users 
                 WHERE username = :user';
     $statement = $db->prepare($query);
@@ -37,7 +37,8 @@ if (isset($_POST['login'])) {
 			echo 'itwork';
             $_SESSION['user'] = array(
                 'user_id' => $user['u_id'],
-                'role' => $user['role']
+                'role' => $user['role'],
+				'username' => $user['username']
             );
             header('Location: homepage/homepage.php');
             exit();
