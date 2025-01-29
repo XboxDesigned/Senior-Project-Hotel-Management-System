@@ -55,6 +55,38 @@ CREATE TABLE housekeeping_tasks (
     FOREIGN KEY (assigned_to) REFERENCES users(u_id)
 );
 
+-- Procedure for Night Audit Process
+DELIMITER //
+CREATE PROCEDURE night_audit()
+BEGIN
+    -- Reconcile reservations (mark no-shows)
+    UPDATE reservations
+    SET status = 'no-show'
+    WHERE check_in_date = CURDATE() AND status = 'confirmed';
+
+    --  Update room statuses for check-outs
+    UPDATE rooms
+    SET room_status = 'available'
+    WHERE room_id IN (
+        SELECT room_id FROM reservations WHERE check_out_date = CURDATE() AND status = 'checked-in'
+    );
+
+    -- Generate housekeeping tasks for vacated rooms
+    INSERT INTO housekeeping_tasks (room_id, assigned_to, task_description, status)
+    SELECT room_id, NULL, 'Clean the room', 'pending'
+    FROM rooms
+    WHERE room_status = 'available' AND room_id NOT IN (
+        SELECT room_id FROM housekeeping_tasks WHERE status = 'completed'
+    );
+
+    -- Generate End-of-Day Revenue Report 
+    SELECT SUM(balance) AS daily_revenue
+    FROM reservations
+    WHERE check_out_date = CURDATE() AND status = 'checked-out';
+END //
+DELIMITER ;
+
+
 -- Insert user
 INSERT INTO users (username, password, role) VALUES 
 ('Nicholas Frischkorn', 'hashed_password', 'admin'),
