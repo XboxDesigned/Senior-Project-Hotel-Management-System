@@ -55,31 +55,56 @@ CREATE TABLE housekeeping_tasks (
     FOREIGN KEY (assigned_to) REFERENCES users(u_id)
 );
 
+-- Table to store maintenance_tasks
+CREATE TABLE maintenance_tasks (
+    task_id INT AUTO_INCREMENT PRIMARY KEY,
+    room_num INT NOT NULL,
+    task_description VARCHAR(255) NOT NULL,
+    status ENUM('pending', 'in progress', 'completed') DEFAULT 'pending',
+    assigned_to INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (room_num) REFERENCES rooms(room_num),
+	FOREIGN KEY (assigned_to) REFERENCES users(u_id)
+	);
+
 -- Procedure for Night Audit Process
 DELIMITER //
 CREATE PROCEDURE night_audit()
 BEGIN
-    -- Reconcile reservations (mark no-shows)
+    -- Mark no-shows
     UPDATE reservations
     SET status = 'no-show'
     WHERE check_in_date = CURDATE() AND status = 'confirmed';
 
-    --  Update room statuses for check-outs
+    -- Update room statuses for check-outs
     UPDATE rooms
     SET room_status = 'available'
-    WHERE room_id IN (
-        SELECT room_id FROM reservations WHERE check_out_date = CURDATE() AND status = 'checked-in'
+    WHERE room_num IN (
+        SELECT room_num FROM reservations WHERE check_out_date = CURDATE() AND status = 'checked-in'
     );
 
-    -- Generate housekeeping tasks for vacated rooms
-    INSERT INTO housekeeping_tasks (room_id, assigned_to, task_description, status)
-    SELECT room_id, NULL, 'Clean the room', 'pending'
+    -- Generate housekeeping tasks for vacated rooms (excluding maintenance rooms)
+    INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status)
+    SELECT room_num, NULL, 'Clean the room', 'pending'
     FROM rooms
-    WHERE room_status = 'available' AND room_id NOT IN (
-        SELECT room_id FROM housekeeping_tasks WHERE status = 'completed'
+    WHERE room_status = 'available' 
+    AND room_num NOT IN (
+        SELECT room_num FROM housekeeping_tasks WHERE status IN ('pending', 'in progress', 'completed')
+    )
+    AND room_num NOT IN (
+        SELECT room_num FROM maintenance_tasks WHERE status IN ('pending', 'in progress')
     );
 
-    -- Generate End-of-Day Revenue Report 
+    -- Generate maintenance tasks for rooms marked as maintenance
+    INSERT INTO maintenance_tasks (room_num, task_description, status)
+    SELECT room_num, 'Perform maintenance check', 'pending'
+    FROM rooms
+    WHERE room_status = 'maintenance' 
+    AND room_num NOT IN (
+        SELECT room_num FROM maintenance_tasks WHERE status IN ('pending', 'in progress')
+    );
+
+    -- Generate End-of-Day Revenue Report
     SELECT SUM(balance) AS daily_revenue
     FROM reservations
     WHERE check_out_date = CURDATE() AND status = 'checked-out';
