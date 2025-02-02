@@ -8,7 +8,7 @@
     <h1>Admin Portal</h1>
 	
     <form method="post">
-        <button type="submit" name="admin_1">Admin Function 1</button>
+        <button type="submit" name="register"><a class="newuser" href="Homepage-Type/Admin/registerForm.php">Add New User</a></button>
     </form>
 	<br>
 	
