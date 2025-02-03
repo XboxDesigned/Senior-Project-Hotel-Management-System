@@ -9,16 +9,15 @@ if ($status == PHP_SESSION_NONE) {
 <html>
 	<head>
 		<title>Users</title>
-		<link rel="stylesheet" type="text/css" href="../edit.css">
+		<link rel="stylesheet" type="text/css" href="../../main.css">
 	</head>
 	<main>
 		<body>
-			<div id = "data">
-				 <h3>Insert the values for the new User</h3>
-			</div>
+		<h3>Insert the values for the new User</h3>
 			<br>
 			<form action="addUsers.php" method="post" id="add_users_form">
-				<input type="submit" value="Add User">
+			<div class="addUsers-input-form">
+				<input type="submit" value="Add User" class="add-user-btn">
 				<table>
 					<tr>
 						<th>Username:</th>
@@ -40,9 +39,8 @@ if ($status == PHP_SESSION_NONE) {
 						</td>
 					</tr>
 				</table>
+			</div>
 			</form>
-			
-			<button><a class="back" href="../../homepage.php">Back</a></button> <br><br>
 		</body>
 	</main>
 </html>
