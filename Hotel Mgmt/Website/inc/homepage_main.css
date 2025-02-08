@@ -1,14 +1,15 @@
 body {
-    margin: 0; 
-    padding: 0; 
-    font-family: Arial, sans-serif;
-	background-color: #F8F6FD
+    background-size: 100%;       
+    background-repeat: no-repeat; 
+    background-position: center;
+	background-color: #f8f6fd;                   
+    height: 100vh;
 }
 
 header {
     width: 100vw;
-    height: 80px; 
-    background-color: #b5a8e7;  
+    height: 10%; 
+    background-color: #9887d5;
     display: flex;
     /*align-items: center;*/
     justify-content: center;
@@ -20,7 +21,12 @@ header {
 }
 
 h1 {
-	text-align: center;	
+	position: relative;
+	color: black;
+	font-style: italic;
+	font-family: Arial, sans-serif;
+	font-size: 3vh;
+	bottom: 10%;
 }
 
 h2 {
@@ -29,6 +35,22 @@ h2 {
 	font-weight: 200;
 }
 
+input {
+    width: 15%;
+    padding: 1.0% 0.5%;
+    margin-bottom: 1.5%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 100%;
+}
+
+label {
+	color: black;
+	font-family: Arial, sans-serif;
+	font-size: 2vh;
+	text-align: left;
+	margin-left: 0;
+}
 
 .logout-register-btn {
 	margin-top: 5%;
@@ -40,4 +62,54 @@ h2 {
     cursor: pointer;
 	border-radius: 15px;
 	border: 1.5px solid black;
+}
+
+.side-buttons-top {
+	margin-top: 50%;
+	width: 50%;
+    font-size: 80%;
+}
+
+.side-buttons-bottom {
+	margin-top: 60%;
+	width: 50%;
+    font-size: 80%;
+}
+
+.side-buttons-container {
+	position: fixed;
+	background-color: #b5a8e7; 
+	height: 90%;
+	width: 15%;
+	top: 10%;
+	left: 0;
+}
+
+.check-in-out-form {
+	position: relative;
+	top: 10%;
+    margin-left: 0;
+	text-align: center;
+    padding: 1rem; 
+}
+
+.book-room-form {
+	position: relative;
+	top: 10%;
+    margin-left: 0;
+	text-align: center;
+    padding: 1rem; 
+}
+
+.error {
+	font-size: 1.5rem;
+	color: red;
+}
+
+.success {
+	position: absolute;
+	top: 40%;
+	right: 21.3%;
+	font-size: 1.5rem;
+	color: green;
 }
