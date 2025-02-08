@@ -1,3 +1,12 @@
+<?php
+
+//Redirect to check_in.php
+if (isset($_POST['check_in'])) {
+  header('Location: check_in.php');
+  exit();
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,8 +27,9 @@
 	<br>
 	
 	<form method="post">
-        <button type="submit" name="admin_3">Front Desk Function 3</button>
+        <button type="submit" name="check_in">Check In</button>
     </form>
 	
 	
 </body>
+</html>
