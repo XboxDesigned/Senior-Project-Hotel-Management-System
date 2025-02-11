@@ -2,7 +2,7 @@ body {
     background-size: 100%;       
     background-repeat: no-repeat; 
     background-position: center;
-	background-color: #f8f6fd;                   
+    background-color: #f8f6fd;                   
     height: 100vh;
 }
 
@@ -11,28 +11,27 @@ header {
     height: 10%; 
     background-color: #9887d5;
     display: flex;
-    /*align-items: center;*/
     justify-content: center;
     font-size: 24px;
     position: fixed; 
     top: 0;
     left: 0;
-	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
-	position: relative;
-	color: black;
-	font-style: italic;
-	font-family: Arial, sans-serif;
-	font-size: 3vh;
-	bottom: 10%;
+    position: relative;
+    color: black;
+    font-style: italic;
+    font-family: Arial, sans-serif;
+    font-size: 3vh;
+    bottom: 10%;
 }
 
 h2 {
-	position: absolute;
-	color: white;
-	font-weight: 200;
+    position: absolute;
+    color: white;
+    font-weight: 200;
 }
 
 input {
@@ -45,71 +44,90 @@ input {
 }
 
 label {
-	color: black;
-	font-family: Arial, sans-serif;
-	font-size: 2vh;
-	text-align: left;
-	margin-left: 0;
+    color: black;
+    font-family: Arial, sans-serif;
+    font-size: 2vh;
+    text-align: left;
+    margin-left: 0;
+}
+
+.logout-register-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .logout-register-btn {
-	margin-top: 5%;
     background-color: #b5a8e7;
     color: white;
     padding: 0.5%;
-    width: 15%;
     font-size: 85%;
     cursor: pointer;
-	border-radius: 15px;
-	border: 1.5px solid black;
+    border-radius: 15px;
+    border: 1.5px solid black;
+    width: auto;
+    z-index: 2;
+    pointer-events: auto; 
 }
 
 .side-buttons-top {
-	margin-top: 50%;
-	width: 50%;
+    margin-top: 50%;
+    width: 50%;
     font-size: 80%;
 }
 
 .side-buttons-bottom {
-	margin-top: 60%;
-	width: 50%;
+    margin-top: 60%;
+    width: 50%;
     font-size: 80%;
 }
 
 .side-buttons-container {
-	position: fixed;
-	background-color: #b5a8e7; 
-	height: 90%;
-	width: 15%;
-	top: 10%;
-	left: 0;
+    position: fixed;
+    background-color: #b5a8e7; 
+    height: 90%;
+    width: 15%;
+    top: 10%;
+    left: 0;
+    z-index: 1; 
+    pointer-events: none; 
 }
 
 .check-in-out-form {
-	position: relative;
-	top: 10%;
+    position: relative;
+    top: 10%;
     margin-left: 0;
-	text-align: center;
+    text-align: center;
     padding: 1rem; 
 }
 
 .book-room-form {
-	position: relative;
-	top: 10%;
+    position: relative;
+    top: 10%;
     margin-left: 0;
-	text-align: center;
+    text-align: center;
     padding: 1rem; 
 }
 
 .error {
-	font-size: 1.5rem;
-	color: red;
+    font-size: 1.5rem;
 }
 
 .success {
-	position: absolute;
-	top: 40%;
-	right: 21.3%;
-	font-size: 1.5rem;
-	color: green;
+    font-size: 1.5rem;
+}
+
+.centered-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+}
+
+.message {
+    font-weight: bold;
+    margin-top: 10px;
 }
