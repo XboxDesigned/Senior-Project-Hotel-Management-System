@@ -69,47 +69,44 @@ CREATE TABLE maintenance_tasks (
 
 -- Procedure for Night Audit Process
 DELIMITER //
+
 CREATE PROCEDURE night_audit()
 BEGIN
-    -- Mark no-shows
+    -- 1. Handle No-Shows:
     UPDATE reservations
     SET status = 'no-show'
     WHERE check_in_date = CURDATE() AND status = 'confirmed';
 
-    -- Update room statuses for check-outs
+    -- 2. Mark rooms as pending:
     UPDATE rooms
-    SET room_status = 'available'
+    SET room_status = 'pending'
     WHERE room_num IN (
-        SELECT room_num FROM reservations WHERE check_out_date = CURDATE() AND status = 'checked-in'
+        SELECT room_num FROM reservations
+        WHERE check_out_date = CURDATE() AND status = 'checked-out'
     );
 
-    -- Generate housekeeping tasks for vacated rooms (excluding maintenance rooms)
-    INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status)
-    SELECT room_num, NULL, 'Clean the room', 'pending'
+    -- 3. Return a list of Pending/In-Progress Rooms:
+    -- Rooms marked pending at checkout will be for housekeeping.
+    SELECT room_num, room_status AS status, 'Needs Housekeeping: Clean the room' AS reason
     FROM rooms
-    WHERE room_status = 'available' 
-    AND room_num NOT IN (
-        SELECT room_num FROM housekeeping_tasks WHERE status IN ('pending', 'in progress', 'completed')
-    )
-    AND room_num NOT IN (
-        SELECT room_num FROM maintenance_tasks WHERE status IN ('pending', 'in progress')
-    );
+    WHERE room_status = 'pending'
+    
+    UNION
+    
+    -- Include any maintenance tasks that are pending or in progress
+    SELECT mt.room_num, 'pending' AS status, mt.task_description AS reason
+    FROM maintenance_tasks mt
+    WHERE mt.status IN ('pending', 'in progress');
 
-    -- Generate maintenance tasks for rooms marked as maintenance
-    INSERT INTO maintenance_tasks (room_num, task_description, status)
-    SELECT room_num, 'Perform maintenance check', 'pending'
-    FROM rooms
-    WHERE room_status = 'maintenance' 
-    AND room_num NOT IN (
-        SELECT room_num FROM maintenance_tasks WHERE status IN ('pending', 'in progress')
-    );
-
-    -- Generate End-of-Day Revenue Report
-    SELECT SUM(balance) AS daily_revenue
-    FROM reservations
-    WHERE check_out_date = CURDATE() AND status = 'checked-out';
+    -- 4. High Balance Report :
+    SELECT r.confirmation_num, r.guest_id, g.first_name, g.last_name, r.room_num, r.balance
+    FROM reservations r
+    JOIN guests g ON r.guest_id = g.guest_id
+    WHERE r.balance > 100;
 END //
+
 DELIMITER ;
+
 
 
 -- Insert user
