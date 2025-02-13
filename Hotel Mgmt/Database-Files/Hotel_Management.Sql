@@ -1,5 +1,4 @@
--- Create or drop the hotel_management database and then use it
-
+-- Drop the database if it exists and create a new one
 DROP DATABASE IF EXISTS hotel_management;
 CREATE DATABASE hotel_management;
 USE hotel_management;
@@ -9,14 +8,14 @@ CREATE TABLE users (
     u_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL -- 'admin', 'receptionist', 'housekeeper'
+    role VARCHAR(50) NOT NULL -- e.g., 'admin', 'receptionist', 'housekeeper'
 );
 
 -- Table to store room details
 CREATE TABLE rooms (
     room_num INT AUTO_INCREMENT PRIMARY KEY,
     room_type VARCHAR(50) NOT NULL, -- e.g., single, double, suite
-    room_status VARCHAR(50) NOT NULL, -- available, occupied, maintenance
+    room_status VARCHAR(50) NOT NULL DEFAULT 'Available', -- e.g., available, occupied, maintenance, dirty
     rate_plan DECIMAL(10, 2) NOT NULL
 );
 
@@ -31,18 +30,42 @@ CREATE TABLE guests (
 
 -- Table to store reservations
 CREATE TABLE reservations (
-    confirmation_num VARCHAR(20) NOT NULL PRIMARY KEY,
-    guest_id INT,
-    room_num INT,
-    check_in_date DATE NOT NULL,
-    check_out_date DATE NOT NULL,
-    nights INT NOT NULL,
-    status VARCHAR(50) NOT NULL, -- confirmed, cancelled, checked-in, checked-out
-    balance DECIMAL(10, 2),
-    FOREIGN KEY (guest_id) REFERENCES guests(guest_id),
-    FOREIGN KEY (room_num) REFERENCES rooms(room_num)
+    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT NOT NULL,
+    confirmation_number VARCHAR(50) NOT NULL UNIQUE,
+    checkin_date DATE NOT NULL,
+    checkout_date DATE NOT NULL,
+    checkout_datetime DATETIME DEFAULT NULL,
+    balance DECIMAL(10,2) DEFAULT 0.00,
+    room_number INT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'active',
+    -- Status can be: 'active', 'pending', 'confirmed', 'canceled', 'checked-in', 'checked-out'
+    FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
+    FOREIGN KEY (room_number) REFERENCES rooms(room_num) ON DELETE CASCADE
 );
 
+-- Table to store guest charges (each charge is linked by guest_id and confirmation_number)
+CREATE TABLE guest_charges (
+    charge_id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT NOT NULL,
+    confirmation_number VARCHAR(50) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
+    FOREIGN KEY (confirmation_number) REFERENCES reservations(confirmation_number) ON DELETE CASCADE
+);
+
+-- Table to store invoices (each invoice is linked by guest_id and confirmation_number)
+CREATE TABLE invoices (
+    invoice_id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT NOT NULL,
+    confirmation_number VARCHAR(50) NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    payment_received DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
+    FOREIGN KEY (confirmation_number) REFERENCES reservations(confirmation_number) ON DELETE CASCADE
+);
 
 -- Table to store housekeeping tasks
 CREATE TABLE housekeeping_tasks (
@@ -274,12 +297,13 @@ INSERT INTO rooms (room_num, room_type, room_status, rate_plan) VALUES
 
 
 -- Insert mock data
-INSERT INTO reservations (confirmation_num, guest_id, room_num, check_in_date, check_out_date, nights, status, balance) VALUES
-('CNF1001', 1, 101, '2025-01-10', '2025-01-15', 5, 'confirmed', 750.00),
-('CNF1002', 2, 201, '2025-02-01', '2025-02-05', 4, 'checked-in', 640.00),
-('CNF1003', 3, 301, '2025-01-20', '2025-01-22', 2, 'cancelled', 0.00),
-('CNF1004', 4, 401, '2025-03-05', '2025-03-10', 5, 'confirmed', 800.00),
-('CNF1005', 5, 501, '2025-01-15', '2025-01-20', 5, 'checked-out', 0.00);
+INSERT INTO reservations (confirmation_number, guest_id, room_number, checkin_date, checkout_date, status, balance)
+VALUES
+('CNF1001', 1, 101, '2025-01-10', '2025-01-15', 'confirmed', 750.00),
+('CNF1002', 2, 201, '2025-02-01', '2025-02-05', 'checked-in', 640.00),
+('CNF1003', 3, 301, '2025-01-20', '2025-01-22', 'cancelled', 0.00),
+('CNF1004', 4, 401, '2025-03-05', '2025-02-13', 'confirmed', 800.00),
+('CNF1005', 5, 501, '2025-01-15', '2025-02-12', 'checked-in', 0.00);
 
 -- Insert sample housekeeping tasks 
 INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status) VALUES
