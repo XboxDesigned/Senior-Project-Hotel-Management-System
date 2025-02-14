@@ -61,28 +61,28 @@ if (isset($_POST['check_out'])) {
     exit();
 }
 
-if (isset($_POST['checkIn'])) {
+if (isset($_POST['check_in'])) {
     // Get guest info from the form
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $emailAddress = $_POST['emailAddress'];
-    $contactNum = $_POST['contactNum'];
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $email_address = $_POST['email_address'];
+    $contact_num = $_POST['contact_num'];
 
     // Check for empty fields
-    if (empty($firstName) || empty($lastName) || empty($emailAddress) || empty($contactNum)) {
+    if (empty($first_name) || empty($last_name) || empty($email_address) || empty($contact_num)) {
         $error_message = 'Please provide more info.';
     }
 
     // Check if guest already exists
     if (empty($error_message)) {
-        $statement = $db->prepare('SELECT guest_id FROM guests WHERE firstName = :firstName
-                                                         AND lastName = :lastName
-                                                         AND contactNum = :contactNum
-                                                         AND emailAddress = :emailAddress');
-        $statement->bindValue(':firstName', $firstName);
-        $statement->bindValue(':lastName', $lastName);
-        $statement->bindValue(':contactNum', $contactNum);
-        $statement->bindValue(':emailAddress', $emailAddress);
+        $statement = $db->prepare('SELECT guest_id FROM guests WHERE first_name = :first_name
+                                                         AND last_name = :last_name
+                                                         AND contact_num = :contact_num
+                                                         AND email_address = :email_address');
+        $statement->bindValue(':first_name', $first_name);
+        $statement->bindValue(':last_name', $last_name);
+        $statement->bindValue(':contact_num', $contact_num);
+        $statement->bindValue(':email_address', $email_address);
         $statement->execute();
 
         if ($statement->fetch()) {
@@ -92,14 +92,14 @@ if (isset($_POST['checkIn'])) {
 
     if (empty($error_message)) {
         // SQL query to insert the new guest into the database
-        $query = 'INSERT INTO guests (firstName, lastName, contactNum, emailAddress)
-                  VALUES (:firstName, :lastName, :contactNum, :emailAddress)';
+        $query = 'INSERT INTO guests (first_name, last_name, contact_num, email_address)
+                  VALUES (:first_name, :last_name, :contact_num, :email_address)';
 
         $statement = $db->prepare($query);
-        $statement->bindValue(':firstName', $firstName);
-        $statement->bindValue(':lastName', $lastName);
-        $statement->bindValue(':contactNum', $contactNum);
-        $statement->bindValue(':emailAddress', $emailAddress);
+        $statement->bindValue(':first_name', $first_name);
+        $statement->bindValue(':last_name', $last_name);
+        $statement->bindValue(':contact_num', $contact_num);
+        $statement->bindValue(':email_address', $email_address);
 
         if ($statement->execute()) {
             $success_message = 'Successful Check In!';
@@ -153,18 +153,18 @@ if (isset($_POST['checkIn'])) {
     <?php } ?>
     
     <label>First Name</label>
-    <input type="text" name="firstName" placeholder="Enter First Name:"><br>
+    <input type="text" name="first_name" placeholder="Enter First Name:"><br>
     
     <label>Last Name</label>
-    <input type="text" name="lastName" placeholder="Enter Last Name:"><br>
+    <input type="text" name="last_name" placeholder="Enter Last Name:"><br>
     
     <label>Email Address</label>
-    <input type="email" name="emailAddress" placeholder="Enter Email Address:"><br>
+    <input type="email" name="email_address" placeholder="Enter Email Address:"><br>
     
     <label>Phone Number</label>
-    <input type="tel" name="contactNum" placeholder="Enter Phone Number:"><br>
+    <input type="tel" name="contact_num" placeholder="Enter Phone Number:"><br>
     
-    <button type="submit" name="checkIn" class="check-in-out-btn">Check In</button> 
+    <button type="submit" name="check_in" class="check-in-out-btn">Check In</button> 
 </form>
 </body>
 </html>
