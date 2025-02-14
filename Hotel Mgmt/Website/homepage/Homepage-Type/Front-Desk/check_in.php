@@ -30,6 +30,48 @@ if (isset($_POST['logout']))
 $error_message = '';
 $success_message = '';
 
+//	Redirect to frontdesk_homepage.php
+if (isset($_POST['home'])) {
+  header('Location: frontdesk_homepage.php');
+  exit();
+}
+
+//	Redirect to rooms.php
+if (isset($_POST['rooms'])) {
+  header('Location: rooms.php');
+  exit();
+}
+
+//	Redirect to cancellations.php
+if (isset($_POST['cancellations'])) {
+  header('Location: cancellations.php');
+  exit();
+}
+
+//	Redirect to book_room.php
+if (isset($_POST['book_room'])) {
+  header('Location: book_room.php');
+  exit();
+}
+
+//	Redirect to night_audit.php when finished
+if (isset($_POST['night_audit'])) {
+  header('Location: ../../../inc/night_audit.php');
+  exit();
+}
+
+//	Redirect to check_in.php
+if (isset($_POST['check_in'])) {
+  header('Location: check_in.php');
+  exit();
+}
+
+//	Redirect to check_out.php
+if (isset($_POST['check_out'])) {
+  header('Location: check_out.php');
+  exit();
+}
+
 if (isset($_POST['checkIn'])) {
     //Get guest info from the form
     $firstName = $_POST['firstName'];
@@ -43,7 +85,7 @@ if (isset($_POST['checkIn'])) {
     }
 	
 	// Check if guest already exists
-	if (empty($error_msg)) {
+	if (empty($error_message)) {
 			
         $statement = $db->prepare('SELECT guest_id FROM guests WHERE first_name = :firstName
 																 AND last_name = :lastName
@@ -75,11 +117,9 @@ if (isset($_POST['checkIn'])) {
 		$statement->bindValue(':emailAddress', $emailAddress);
         
         if ($statement->execute()) {
-			include ('book_room.php');
-			exit();
-			$error_message != '';
-			$logout_msg != '';
 			$success_message = 'Successful Check In!';
+			header('Location: book_room.php');
+			exit();
 		}
 	}	
 }
@@ -91,6 +131,7 @@ if (isset($_POST['checkIn'])) {
 <head>
 	<title>Check In</title>
 	<link rel="stylesheet" type="text/css" href="../../../inc/homepage_main.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <header>
 	<h2>Hello, <?php echo htmlspecialchars($name); ?></h2>
@@ -104,48 +145,48 @@ if (isset($_POST['checkIn'])) {
 <div class="side-buttons-container">
 	<div class="side-buttons-top">
 	<form method="post">
-        <button type="submit" name="admin_1">Home</button>
+        <button type="submit" name="home" id="side-buttons">Home</button>
     </form>
 	<br>
 	
 	<form method="post">
-        <button type="submit" name="admin_2">Rooms</button>
+        <button type="submit" name="rooms" id="side-buttons">Rooms</button>
     </form>
 	<br>
 	
 	<form method="post">
-        <button type="submit" name="admin_3">Cancellations</button>
+        <button type="submit" name="cancellations" id="side-buttons">Cancellations</button>
     </form>
 	<br>
 	
 	<form method="post">
-        <button type="submit" name="admin_4">Guests</button>
+        <button type="submit" name="guests" id="side-buttons">Guests</button>
     </form>
 	</div>
 	
 	<div class="side-buttons-bottom">
 	<form method="post">
-        <button type="submit" name="admin_5">Maintenance</button>
+        <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>
     </form>
 	<br>
 	
     <form method="post">
-        <button type="submit" name="admin_6">Night Audit</button>
+        <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
     </form>
 	<br>
 	
 	<form method="post">
-        <button type="submit" name="admin_7">Book Room</button>
+        <button type="submit" name="book_room" id="side-buttons">Book Room</button>
     </form>
 	<br>
 	
 	<form method="post">
-        <button type="submit" name="check_in">Check In</button>
+        <button type="submit" name="check_in" id="side-buttons">Check In</button>
     </form>
 	<br>
 	
 	<form method="post">
-        <button type="submit" name="admin_9">Check Out</button>
+        <button type="submit" name="check_out" id="side-buttons">Check Out</button>
     </form>
 	</div>
 </div>
