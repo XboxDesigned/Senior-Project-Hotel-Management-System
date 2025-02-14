@@ -32,16 +32,16 @@ CREATE TABLE guests (
 CREATE TABLE reservations (
     reservation_id INT AUTO_INCREMENT PRIMARY KEY,
     guest_id INT NOT NULL,
-    confirmation_number VARCHAR(50) NOT NULL UNIQUE,
+    confirmation_num VARCHAR(50) NOT NULL UNIQUE,
     checkin_date DATE NOT NULL,
     checkout_date DATE NOT NULL,
     checkout_datetime DATETIME DEFAULT NULL,
     balance DECIMAL(10,2) DEFAULT 0.00,
-    room_number INT NOT NULL,
+    room_num INT NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'active',
     -- Status can be: 'active', 'pending', 'confirmed', 'canceled', 'checked-in', 'checked-out'
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
-    FOREIGN KEY (room_number) REFERENCES rooms(room_num) ON DELETE CASCADE
+    FOREIGN KEY (room_num) REFERENCES rooms(room_num) ON DELETE CASCADE
 );
 
 -- Table to store guest charges (each charge is linked by guest_id and confirmation_number)
