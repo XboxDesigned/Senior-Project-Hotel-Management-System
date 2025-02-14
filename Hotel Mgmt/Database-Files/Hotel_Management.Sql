@@ -48,23 +48,23 @@ CREATE TABLE reservations (
 CREATE TABLE guest_charges (
     charge_id INT AUTO_INCREMENT PRIMARY KEY,
     guest_id INT NOT NULL,
-    confirmation_number VARCHAR(50) NOT NULL,
+    confirmation_num VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
-    FOREIGN KEY (confirmation_number) REFERENCES reservations(confirmation_number) ON DELETE CASCADE
+    FOREIGN KEY (confirmation_num) REFERENCES reservations(confirmation_num) ON DELETE CASCADE
 );
 
 -- Table to store invoices (each invoice is linked by guest_id and confirmation_number)
 CREATE TABLE invoices (
     invoice_id INT AUTO_INCREMENT PRIMARY KEY,
     guest_id INT NOT NULL,
-    confirmation_number VARCHAR(50) NOT NULL,
+    confirmation_num VARCHAR(50) NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
     payment_received DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
-    FOREIGN KEY (confirmation_number) REFERENCES reservations(confirmation_number) ON DELETE CASCADE
+    FOREIGN KEY (confirmation_num) REFERENCES reservations(confirmation_num) ON DELETE CASCADE
 );
 
 -- Table to store housekeeping tasks
@@ -297,7 +297,7 @@ INSERT INTO rooms (room_num, room_type, room_status, rate_plan) VALUES
 
 
 -- Insert mock data
-INSERT INTO reservations (confirmation_number, guest_id, room_number, checkin_date, checkout_date, status, balance)
+INSERT INTO reservations (confirmation_num, guest_id, room_num, checkin_date, checkout_date, status, balance)
 VALUES
 ('CNF1001', 1, 101, '2025-01-10', '2025-01-15', 'confirmed', 750.00),
 ('CNF1002', 2, 201, '2025-02-01', '2025-02-05', 'checked-in', 640.00),
