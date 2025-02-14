@@ -91,12 +91,12 @@ if (isset($_POST['submit_booking'])) {
 	//	Get booking details
 	$room_num = $_POST['room_num'];
     $num_guests = $_POST['num_guests'];
-    $check_in_date = $_POST['check_in_date'];
-    $check_out_date = $_POST['check_out_date'];
+    $checkin_date = $_POST['checkin_date'];
+    $checkout_date = $_POST['checkout_date'];
 	
 	//	Check for empty fields
 	if (empty($firstName) || empty($lastName) || empty($emailAddress) || empty($contactNum) || 
-		empty($room_num) || empty($num_guests) || empty($check_in_date) || empty($check_out_date)) {
+		empty($room_num) || empty($num_guests) || empty($checkin_date) || empty($checkout_date)) {
 		$error_message = 'Please provide more information.';
 	}
 	
@@ -105,17 +105,17 @@ if (isset($_POST['submit_booking'])) {
 										   WHERE room_num = :room_num 
                                            AND status IN ('confirmed', 'checked-in')
                                            AND (
-                                             (check_in_date <= :check_in AND check_out_date > :check_in)
+                                             (checkin_date <= :check_in AND checkout_date > :check_in)
                                              OR 
-                                             (check_in_date < :check_out AND check_out_date >= :check_out)
+                                             (checkin_date < :check_out AND checkout_date >= :check_out)
                                              OR 
-                                             (check_in_date >= :check_in AND check_out_date <= :check_out)
+                                             (checkin_date >= :check_in AND checkout_date <= :check_out)
 										 )");
         
         $checkAvailability->execute([
             ':room_num' => $room_num,
-            ':check_in' => $check_in_date,
-            ':check_out' => $check_out_date
+            ':check_in' => $checkin_date,
+            ':check_out' => $checkout_date
         ]);
         
         if ($checkAvailability->fetch()) {
@@ -165,8 +165,8 @@ if (isset($_POST['submit_booking'])) {
 				$guest_id = $db->lastInsertId();
         
 				// Calculate nights
-				$check_in = new DateTime($_POST['check_in_date']);
-				$check_out = new DateTime($_POST['check_out_date']);
+				$check_in = new DateTime($_POST['checkin_date']);
+				$check_out = new DateTime($_POST['checkout_date']);
 				$nights = $check_in->diff($check_out)->days;
 				$confirmation_num = 'CNF' . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
 	
@@ -183,16 +183,16 @@ if (isset($_POST['submit_booking'])) {
     
 				// Insert reservation
 				$statement = $db->prepare("INSERT INTO reservations (confirmation_num, guest_id, room_num, 
-										   check_in_date, check_out_date, nights, status, balance) 
+										   checkin_date, checkout_date, nights, status, balance) 
 										   VALUES (:confirmation_num, :guest_id, :room_num, 
-										  :check_in_date, :check_out_date, :nights, 'confirmed', :balance)");
+										  :checkin_date, :checkout_date, :nights, 'confirmed', :balance)");
 							   
         
 				$statement->execute([':confirmation_num' => $confirmation_num,
 									 ':guest_id' => $guest_id,
 									 ':room_num' => $_POST['room_num'],
-									 ':check_in_date' => $_POST['check_in_date'],
-									 ':check_out_date' => $_POST['check_out_date'],
+									 ':checkin_date' => $_POST['checkin_date'],
+									 ':checkout_date' => $_POST['checkout_date'],
 									 ':nights' => $nights,
 									 ':balance' => $balance]);
 		
@@ -329,10 +329,10 @@ if (isset($_POST['submit_booking'])) {
         </select><br>
         
         <label>Check In Date:</label>
-        <input type="text" name="check_in_date" id="check_in_date" placeholder="Select Check-in Date"><br>
+        <input type="text" name="checkin_date" id="checkin_date" placeholder="Select Check-in Date"><br>
         
         <label>Check Out Date:</label>
-        <input type="text" name="check_out_date" id="check_out_date" placeholder="Select Check-out Date"><br>
+        <input type="text" name="checkout_date" id="checkout_date" placeholder="Select Check-out Date"><br>
         
         <button type="submit" name="submit_booking">Book Room</button>
 		
@@ -344,7 +344,7 @@ if (isset($_POST['submit_booking'])) {
 			let unavailableDates = [];
 
 			// Initialize date pickers
-			checkInPicker = flatpickr("#check_in_date", {
+			checkInPicker = flatpickr("#checkin_date", {
 				minDate: "today",
 				disable: unavailableDates,
 				onChange: function(selectedDates) {
@@ -357,7 +357,7 @@ if (isset($_POST['submit_booking'])) {
 				}
 			});
 
-			checkOutPicker = flatpickr("#check_out_date", {
+			checkOutPicker = flatpickr("#checkout_date", {
 				minDate: "today",
 				disable: unavailableDates
 			});
@@ -371,8 +371,8 @@ if (isset($_POST['submit_booking'])) {
                     
 							// Convert reservations to disabled date ranges
 							unavailableDates = reservations.map(res => ({
-								from: new Date(res.check_in_date),
-								to: new Date(res.check_out_date)
+								from: new Date(res.checkin_date),
+								to: new Date(res.checkout_date)
 							}));
 
 							// Update both date pickers with new disabled dates
