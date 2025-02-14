@@ -38,6 +38,7 @@ CREATE TABLE reservations (
     checkout_datetime DATETIME DEFAULT NULL,
     balance DECIMAL(10,2) DEFAULT 0.00,
     room_num INT NOT NULL,
+	nights INT,
     status VARCHAR(50) NOT NULL DEFAULT 'active',
     -- Status can be: 'active', 'pending', 'confirmed', 'canceled', 'checked-in', 'checked-out'
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
