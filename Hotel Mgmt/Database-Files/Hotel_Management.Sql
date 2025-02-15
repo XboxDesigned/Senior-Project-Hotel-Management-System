@@ -91,17 +91,43 @@ CREATE TABLE maintenance_tasks (
 	FOREIGN KEY (assigned_to) REFERENCES users(u_id)
 	);
 
--- Procedure for Night Audit Process
 DELIMITER //
 
 CREATE PROCEDURE night_audit()
 BEGIN
-    -- 1. Handle No-Shows:
-    UPDATE reservations
-    SET status = 'no-show'
-    WHERE check_in_date = CURDATE() AND status = 'confirmed';
+    -- 1. Charge guests for each night stayed
+    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
+    SELECT r.guest_id, r.confirmation_num, 'Nightly Room Charge', rm.rate_plan
+    FROM reservations r
+    JOIN rooms rm ON r.room_num = rm.room_num
+    WHERE r.status = 'checked-in';
+    
+    -- 2. Update reservation balances with nightly charges
+    UPDATE reservations r
+    JOIN rooms rm ON r.room_num = rm.room_num
+    SET r.balance = r.balance + rm.rate_plan
+    WHERE r.status = 'checked-in';
 
-    -- 2. Mark rooms as pending:
+    -- 3. Charge no-shows the first night's rate
+    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
+    SELECT r.guest_id, r.confirmation_num, 'No-Show Fee', rm.rate_plan
+    FROM reservations r
+    JOIN rooms rm ON r.room_num = rm.room_num
+    WHERE r.check_in_date = CURDATE() AND r.status = 'no-show';
+
+    -- 4. Update reservation balances for no-shows
+    UPDATE reservations r
+    JOIN rooms rm ON r.room_num = rm.room_num
+    SET r.balance = r.balance + rm.rate_plan
+    WHERE r.check_in_date = CURDATE() AND r.status = 'no-show';
+
+    -- 5. Store charges in the guest_charges table
+    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
+    SELECT r.guest_id, r.confirmation_num, 'Final Night Audit Charge', r.balance
+    FROM reservations r
+    WHERE r.status IN ('checked-in', 'no-show');
+
+    -- 6. Mark rooms as pending for housekeeping
     UPDATE rooms
     SET room_status = 'pending'
     WHERE room_num IN (
@@ -109,20 +135,7 @@ BEGIN
         WHERE check_out_date = CURDATE() AND status = 'checked-out'
     );
 
-    -- 3. Return a list of Pending/In-Progress Rooms:
-    -- Rooms marked pending at checkout will be for housekeeping.
-    SELECT room_num, room_status AS status, 'Needs Housekeeping: Clean the room' AS reason
-    FROM rooms
-    WHERE room_status = 'pending'
-    
-    UNION
-    
-    -- Include any maintenance tasks that are pending or in progress
-    SELECT mt.room_num, 'pending' AS status, mt.task_description AS reason
-    FROM maintenance_tasks mt
-    WHERE mt.status IN ('pending', 'in progress');
-
-    -- 4. High Balance Report :
+    -- 7. Generate High Balance Report
     SELECT r.confirmation_num, r.guest_id, g.first_name, g.last_name, r.room_num, r.balance
     FROM reservations r
     JOIN guests g ON r.guest_id = g.guest_id
@@ -130,6 +143,50 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Trigger to update reservations.balance when a charge is inserted
+DELIMITER $$
+CREATE TRIGGER after_guest_charge_insert
+AFTER INSERT ON guest_charges
+FOR EACH ROW
+BEGIN
+    UPDATE reservations
+    SET balance = (SELECT IFNULL(SUM(amount), 0) FROM guest_charges WHERE confirmation_num = NEW.confirmation_num)
+    WHERE confirmation_num = NEW.confirmation_num;
+END$$
+DELIMITER ;
+
+-- Trigger to update reservations.balance when a charge is deleted
+DELIMITER $$
+CREATE TRIGGER after_guest_charge_delete
+AFTER DELETE ON guest_charges
+FOR EACH ROW
+BEGIN
+    UPDATE reservations
+    SET balance = (SELECT IFNULL(SUM(amount), 0) FROM guest_charges WHERE confirmation_num = OLD.confirmation_num)
+    WHERE confirmation_num = OLD.confirmation_num;
+END$$
+DELIMITER ;
+
+-- Trigger to update reservations.balance when a charge is updated
+DELIMITER $$
+CREATE TRIGGER after_guest_charge_update
+AFTER UPDATE ON guest_charges
+FOR EACH ROW
+BEGIN
+    UPDATE reservations
+    SET balance = (SELECT IFNULL(SUM(amount), 0) FROM guest_charges WHERE confirmation_num = NEW.confirmation_num)
+    WHERE confirmation_num = NEW.confirmation_num;
+END$$
+DELIMITER ;
+
+-- View to check mismatches between reservations.balance and actual guest charges
+CREATE VIEW balance_mismatch AS
+SELECT r.reservation_id, r.confirmation_num, r.balance AS recorded_balance, IFNULL(SUM(gc.amount), 0) AS computed_balance
+FROM reservations r
+LEFT JOIN guest_charges gc ON r.confirmation_num = gc.confirmation_num
+GROUP BY r.reservation_id, r.confirmation_num, r.balance
+HAVING r.balance <> computed_balance;
 
 
 
