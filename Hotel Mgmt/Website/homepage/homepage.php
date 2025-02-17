@@ -28,6 +28,12 @@ if (isset($_POST['logout']))
 <!DOCTYPE html>
 <html>
 <head>
+        <style>
+ 			td {
+       			padding: 10px 20px; /* Adjust space inside each cell, temporary */
+                width: 1200px;
+   			}
+		</style>
 	<header>
 		<title>Home Page</title>
 		<link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">

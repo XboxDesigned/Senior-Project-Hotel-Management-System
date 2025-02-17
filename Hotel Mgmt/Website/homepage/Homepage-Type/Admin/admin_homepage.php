@@ -17,10 +17,21 @@
         header('Homepage-Type/Admin/night_audit.php');
     }
 	
-	if (isset($_POST['placeholder'])) {
+	if (isset($_POST['select'])) {
+        include('Homepage-Type/Admin/selectUsers.php');
+    }
+
+    if (isset($_POST['placeholder'])) {
         include('Homepage-Type/Admin/page_template.php');
     }
-    ?>
+    
+	// Check if update_id is set, then include updateUsers.php
+	if (isset($_GET['update_id'])) {
+		include('homepage-type/admin/updateUsers.php');
+	}
+	?>
+    
+    
 
     <form method="post">
         <button type="submit" name="register">Add New User</button>
@@ -28,7 +39,7 @@
     <br>
     
     <form method="post">
-        <button type="submit" name="placeholder">Function 1</button>
+        <button type="submit" name="select">View Users</button>
     </form>
 	<br>
 	
