@@ -49,9 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_user'])) {
     if (!$password) {
         $error .= "Password can't be blank<br>";
     }
-    if ($role !== "Admin" && $role !== "User") { // Adjust based on your role options
-        $error .= "Role must be Admin or User<br>";
-    }
+    
 
     // Display errors if validation fails
     if ($error !== "") {
@@ -99,8 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_user'])) {
                 <th>Role:</th>
                 <td>
                     <select name="role" required>
-                        <option value="Admin" <?php echo ($user["role"] === "Admin") ? "selected" : ""; ?>>Admin</option>
-                        <option value="User" <?php echo ($user["role"] === "User") ? "selected" : ""; ?>>User</option>
+                        <option value="admin" <?php echo ($user["role"] === "Admin") ? "selected" : ""; ?>>Admin</option>
+						<option value="front_desk" <?php echo ($user["role"] === "Admin") ? "selected" : ""; ?>>Front Desk</option>
+						<option value="maintenance" <?php echo ($user["role"] === "Maintenance") ? "selected" : ""; ?>>Maintenance/Housekeeper</option>
                     </select>
                 </td>
             </tr>
