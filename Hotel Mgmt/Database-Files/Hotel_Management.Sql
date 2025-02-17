@@ -95,54 +95,64 @@ DELIMITER //
 
 CREATE PROCEDURE night_audit()
 BEGIN
+    -- Temporary table for reservation updates
+    CREATE TEMPORARY TABLE temp_reservations AS 
+    SELECT guest_id, confirmation_num, room_num, balance, status, checkin_date 
+    FROM reservations;
+
     -- 1. Charge guests for each night stayed
     INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
-    SELECT r.guest_id, r.confirmation_num, 'Nightly Room Charge', rm.rate_plan
-    FROM reservations r
-    JOIN rooms rm ON r.room_num = rm.room_num
-    WHERE r.status = 'checked-in';
-    
-    -- 2. Update reservation balances with nightly charges
+    SELECT t.guest_id, t.confirmation_num, 'Nightly Room Charge', rm.rate_plan
+    FROM temp_reservations t
+    JOIN rooms rm ON t.room_num = rm.room_num
+    WHERE t.status = 'checked-in';
+
+    -- 2. Update reservation balances
     UPDATE reservations r
     JOIN rooms rm ON r.room_num = rm.room_num
     SET r.balance = r.balance + rm.rate_plan
     WHERE r.status = 'checked-in';
 
-    -- 3. Charge no-shows the first night's rate
+    -- 3. Charge no-shows
     INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
-    SELECT r.guest_id, r.confirmation_num, 'No-Show Fee', rm.rate_plan
-    FROM reservations r
-    JOIN rooms rm ON r.room_num = rm.room_num
-    WHERE r.check_in_date = CURDATE() AND r.status = 'no-show';
+    SELECT t.guest_id, t.confirmation_num, 'No-Show Fee', rm.rate_plan
+    FROM temp_reservations t
+    JOIN rooms rm ON t.room_num = rm.room_num
+    WHERE t.checkin_date = CURDATE() AND t.status = 'no-show';
 
     -- 4. Update reservation balances for no-shows
     UPDATE reservations r
     JOIN rooms rm ON r.room_num = rm.room_num
     SET r.balance = r.balance + rm.rate_plan
-    WHERE r.check_in_date = CURDATE() AND r.status = 'no-show';
+    WHERE r.checkin_date = CURDATE() AND r.status = 'no-show';
 
-    -- 5. Store charges in the guest_charges table
+    -- 5. Store charges separately
     INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
-    SELECT r.guest_id, r.confirmation_num, 'Final Night Audit Charge', r.balance
-    FROM reservations r
-    WHERE r.status IN ('checked-in', 'no-show');
+    SELECT t.guest_id, t.confirmation_num, 'Final Night Audit Charge', t.balance
+    FROM temp_reservations t
+    WHERE t.status IN ('checked-in', 'no-show');
 
     -- 6. Mark rooms as pending for housekeeping
-    UPDATE rooms
-    SET room_status = 'pending'
-    WHERE room_num IN (
-        SELECT room_num FROM reservations
-        WHERE check_out_date = CURDATE() AND status = 'checked-out'
-    );
+	UPDATE rooms
+	SET room_status = 'pending'
+	WHERE room_num IN (
+    SELECT room_num FROM reservations
+    WHERE (checkout_date = CURDATE() OR DATE(checkout_datetime) = CURDATE())
+    AND status = 'checked-out'
+	);
 
     -- 7. Generate High Balance Report
-    SELECT r.confirmation_num, r.guest_id, g.first_name, g.last_name, r.room_num, r.balance
-    FROM reservations r
-    JOIN guests g ON r.guest_id = g.guest_id
-    WHERE r.balance > 100;
+    SELECT t.confirmation_num, t.guest_id, g.first_name, g.last_name, t.room_num, t.balance
+    FROM temp_reservations t
+    JOIN guests g ON t.guest_id = g.guest_id
+    WHERE t.balance > 100;
+
+    -- Drop the temporary table after use
+    DROP TEMPORARY TABLE IF EXISTS temp_reservations;
 END //
 
 DELIMITER ;
+
 
 -- Trigger to update reservations.balance when a charge is inserted
 DELIMITER $$
@@ -353,15 +363,15 @@ INSERT INTO rooms (room_num, room_type, room_status, rate_plan) VALUES
 ('524', 'Suite', 'occupied', 200.00),
 ('525', 'Single', 'available', 100.00);
 
-
--- Insert mock data
-INSERT INTO reservations (confirmation_num, guest_id, room_num, checkin_date, checkout_date, status, balance)
+-- Insert sample reservations
+INSERT INTO reservations (confirmation_num, guest_id, room_num, checkin_date, checkout_date, checkout_datetime, status, balance)
 VALUES
-('CNF1001', 1, 101, '2025-01-10', '2025-01-15', 'confirmed', 750.00),
-('CNF1002', 2, 201, '2025-02-01', '2025-02-05', 'checked-in', 640.00),
-('CNF1003', 3, 301, '2025-01-20', '2025-01-22', 'cancelled', 0.00),
-('CNF1004', 4, 401, '2025-03-05', '2025-02-13', 'confirmed', 800.00),
-('CNF1005', 5, 501, '2025-01-15', '2025-02-12', 'checked-in', 0.00);
+('CNF1001', 1, 101, '2025-01-10', '2025-01-15', '2025-01-15 12:00:00', 'confirmed', 750.00),
+('CNF1002', 2, 201, '2025-02-01', '2025-02-05', '2025-02-05 11:00:00', 'checked-in', 640.00),
+('CNF1003', 3, 301, '2025-01-20', '2025-01-22', NULL, 'cancelled', 0.00),
+('CNF1004', 4, 401, '2025-03-05', '2025-02-13', '2025-02-13 15:30:00', 'confirmed', 800.00),
+('CNF1005', 5, 501, '2025-01-15', '2025-02-12', NULL, 'checked-in', 0.00);
+
 
 -- Insert sample housekeeping tasks 
 INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status) VALUES
