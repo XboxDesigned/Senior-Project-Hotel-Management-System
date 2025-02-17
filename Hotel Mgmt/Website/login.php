@@ -56,7 +56,7 @@ if (isset($_POST['login'])) {
 <link rel="stylesheet" type="text/css" href="inc/main.css">
 </head>
 <body>
-	<img src="./images/hilton_logo.jpg" alt="hilton-img" class="hilton-logo">
+	<img src="./images/hotel_logo.png" alt="hilton-img" class="hilton-logo">
 	<div class="input-container">
 		<?php if (!empty($error_message)){ ?>
 			<p class="error"><?php echo $error_message; ?></p>
