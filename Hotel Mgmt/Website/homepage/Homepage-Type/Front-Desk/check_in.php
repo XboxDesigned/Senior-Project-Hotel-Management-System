@@ -1,113 +1,73 @@
 <?php
-require_once '../../../inc/db_connect.php';
+require_once('../../Website/inc/db_connect.php');
 
-// Start the session if not already started
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-if (!isset($_SESSION['user'])) {
-    header('Location: ../../../login.php'); // Redirect to the login if not logged in
-    exit();
-}
-
-// Check if the logout button is clicked
-if (isset($_POST['logout'])) {
-    session_destroy();
-    header('Location: ../../../login.php');
-    exit();
-}
-
-$name = $_SESSION['user']['username'];
-$role = $_SESSION['user']['role'];
-
-// Initialize error and success messages
 $error_message = '';
 $success_message = '';
 
-// Redirects
-if (isset($_POST['home'])) {
-    header('Location: frontdesk_homepage.php');
-    exit();
-}
 
-if (isset($_POST['rooms'])) {
-    header('Location: rooms.php');
-    exit();
-}
-
-if (isset($_POST['cancellations'])) {
-    header('Location: cancellations.php');
-    exit();
-}
-
-if (isset($_POST['book_room'])) {
-    header('Location: book_room.php');
-    exit();
-}
-
-if (isset($_POST['night_audit'])) {
-    header('Location: ../../../inc/night_audit.php');
-    exit();
-}
+$guests = $db->query("SELECT g.guest_id, g.first_name, g.last_name FROM guests g 
+                      JOIN reservations r ON g.guest_id = r.guest_id
+					  WHERE r.status != 'checked-in'")
+                      ->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_POST['check_in'])) {
-    header('Location: check_in.php');
-    exit();
-}
 
-if (isset($_POST['check_out'])) {
-    header('Location: check_out.php');
-    exit();
-}
+    $guest_id = $_POST['guest_id'] ?? null;
+    $first_name = trim($_POST['first_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+    $email_address = trim($_POST['email_address'] ?? '');
+    $contact_num = trim($_POST['contact_num'] ?? '');
 
-if (isset($_POST['check_in'])) {
-    // Get guest info from the form
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email_address = $_POST['email_address'];
-    $contact_num = $_POST['contact_num'];
+    if ($guest_id) {
+        $stmt = $db->prepare("SELECT * FROM guests WHERE guest_id = :guest_id");
+        $stmt->bindValue(':guest_id', $guest_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $guest = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check for empty fields
-    if (empty($first_name) || empty($last_name) || empty($email_address) || empty($contact_num)) {
-        $error_message = 'Please provide more info.';
-    }
+        if ($guest) {
+            $first_name = $guest['first_name'];
+            $last_name = $guest['last_name'];
+            $email_address = $guest['email_address'];
+            $contact_num = $guest['contact_num'];
+        } else {
+            $error_message = 'Selected guest not found.';
+        }
+    } else {
+        if (empty($first_name) || empty($last_name) || empty($email_address) || empty($contact_num)) {
+            $error_message = 'Please select a guest to check in.';
+        }
 
-    // Check if guest already exists
-    if (empty($error_message)) {
-        $statement = $db->prepare('SELECT guest_id FROM guests WHERE first_name = :first_name
-                                                         AND last_name = :last_name
-                                                         AND contact_num = :contact_num
-                                                         AND email_address = :email_address');
-        $statement->bindValue(':first_name', $first_name);
-        $statement->bindValue(':last_name', $last_name);
-        $statement->bindValue(':contact_num', $contact_num);
-        $statement->bindValue(':email_address', $email_address);
-        $statement->execute();
-
-        if ($statement->fetch()) {
-            $error_message = 'Guest already checked in.';
+        if (empty($error_message)) {
+            $query = "INSERT INTO guests (first_name, last_name, contact_num, email_address) 
+                      VALUES (:first_name, :last_name, :contact_num, :email_address)";
+            $stmt = $db->prepare($query);
+            $stmt->bindValue(':first_name', $first_name);
+            $stmt->bindValue(':last_name', $last_name);
+            $stmt->bindValue(':contact_num', $contact_num);
+            $stmt->bindValue(':email_address', $email_address);
+            
+            if ($stmt->execute()) {
+                $guest_id = $db->lastInsertId();
+            } else {
+                $error_message = 'Error registering new guest.';
+            }
         }
     }
 
-    if (empty($error_message)) {
-        // SQL query to insert the new guest into the database
-        $query = 'INSERT INTO guests (first_name, last_name, contact_num, email_address)
-                  VALUES (:first_name, :last_name, :contact_num, :email_address)';
+    if (!empty($guest_id) && empty($error_message)) {
+        // Update reservation status to "checked-in"
+        $updateQuery = "UPDATE reservations SET status = 'checked-in' WHERE guest_id = :guest_id";
+        $stmt = $db->prepare($updateQuery);
+        $stmt->bindValue(':guest_id', $guest_id, PDO::PARAM_INT);
 
-        $statement = $db->prepare($query);
-        $statement->bindValue(':first_name', $first_name);
-        $statement->bindValue(':last_name', $last_name);
-        $statement->bindValue(':contact_num', $contact_num);
-        $statement->bindValue(':email_address', $email_address);
-
-        if ($statement->execute()) {
-            $success_message = 'Successful Check In!';
-            header('Location: book_room.php');
-            exit();
+        if ($stmt->execute()) {
+            $success_message = 'Successful Check-In!';
+        } else {
+            $error_message = 'Error updating reservation status.';
         }
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -115,14 +75,12 @@ if (isset($_POST['check_in'])) {
 <head>
     <title>Check In</title>
     <link rel="stylesheet" type="text/css" href="../../../inc/homepage_main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <header>
-    <h2>Hello, <?php echo htmlspecialchars($name); ?></h2>
-    
-    <!-- Logout Button -->
+    <h2>Hello, <?php echo htmlspecialchars($_SESSION['user']['username'] ?? 'Guest'); ?></h2>
+
     <form method="post">
-        <button type="submit" name="logout" id="submit" class="logout-register-btn">LOGOUT</button><br>
+        <button type="submit" name="logout" class="logout-register-btn">LOGOUT</button><br>
     </form>
 </header>
 <body>
@@ -133,7 +91,7 @@ if (isset($_POST['check_in'])) {
         <form method="post"><button type="submit" name="cancellations" id="side-buttons">Cancellations</button></form><br>
         <form method="post"><button type="submit" name="guests" id="side-buttons">Guests</button></form>
     </div>
-    
+
     <div class="side-buttons-bottom">
         <form method="post"><button type="submit" name="maintenance" id="side-buttons">Maintenance</button></form><br>
         <form method="post"><button type="submit" name="night_audit" id="side-buttons">Night Audit</button></form><br>
@@ -145,24 +103,24 @@ if (isset($_POST['check_in'])) {
 
 <form class="check-in-out-form" method="post">
     <h1>GUEST CHECK IN</h1><br>
+
     <?php if (!empty($error_message)) { ?>
         <p class="error"><?php echo $error_message; ?></p>
     <?php } ?>
     <?php if (!empty($success_message)) { ?>
         <p class="success"><?php echo $success_message; ?></p>
     <?php } ?>
-    
-    <label>First Name</label>
-    <input type="text" name="first_name" placeholder="Enter First Name:"><br>
-    
-    <label>Last Name</label>
-    <input type="text" name="last_name" placeholder="Enter Last Name:"><br>
-    
-    <label>Email Address</label>
-    <input type="email" name="email_address" placeholder="Enter Email Address:"><br>
-    
-    <label>Phone Number</label>
-    <input type="tel" name="contact_num" placeholder="Enter Phone Number:"><br>
+
+    <label>Select Guest</label>
+    <select name="guest_id">
+        <option value="">-- Select a Guest --</option>
+        <?php foreach ($guests as $guest) { ?>
+            <option value="<?php echo $guest['guest_id']; ?>">
+                <?php echo htmlspecialchars($guest['first_name'] . ' ' . $guest['last_name']); ?>
+            </option>
+        <?php } ?>
+    </select>
+    <br>
     
     <button type="submit" name="check_in" class="check-in-out-btn">Check In</button> 
 </form>

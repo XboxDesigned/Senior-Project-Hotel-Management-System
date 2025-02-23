@@ -1,5 +1,5 @@
 <?php
-require_once '../../../inc/db_connect.php';
+require_once('../../Website/inc/db_connect.php');
 
 // Start the session if not already started
 if (session_status() == PHP_SESSION_NONE) 
@@ -30,47 +30,7 @@ if (isset($_POST['logout']))
 $error_message = '';
 $success_message = '';
 
-//	Redirect to frontdesk_homepage.php
-if (isset($_POST['home'])) {
-  header('Location: frontdesk_homepage.php');
-  exit();
-}
 
-//	Redirect to rooms.php
-if (isset($_POST['rooms'])) {
-  header('Location: rooms.php');
-  exit();
-}
-
-//	Redirect to cancellations.php
-if (isset($_POST['cancellations'])) {
-  header('Location: cancellations.php');
-  exit();
-}
-
-//	Redirect to book_room.php
-if (isset($_POST['book_room'])) {
-  header('Location: book_room.php');
-  exit();
-}
-
-//	Redirect to night_audit.php when finished
-if (isset($_POST['night_audit'])) {
-  header('Location: ../../../inc/night_audit.php');
-  exit();
-}
-
-//	Redirect to check_in.php
-if (isset($_POST['check_in'])) {
-  header('Location: check_in.php');
-  exit();
-}
-
-//	Redirect to check_out.php
-if (isset($_POST['check_out'])) {
-  header('Location: check_out.php');
-  exit();
-}
 
 // Get available rooms
 
@@ -219,8 +179,7 @@ if (isset($_POST['submit_booking'])) {
 <head>
 	<title>Book Room</title>
 	<link rel="stylesheet" type="text/css" href="../../../inc/homepage_main.css">
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+
     <!-- Add Flatpickr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 </head>
@@ -234,53 +193,7 @@ if (isset($_POST['submit_booking'])) {
 
 </header>
 <body>
-<div class="side-buttons-container">
-	<div class="side-buttons-top">
-	<form method="post">
-        <button type="submit" name="home" id="side-buttons">Home</button>
-    </form>
-	<br>
-	
-	<form method="post">
-        <button type="submit" name="rooms" id="side-buttons">Rooms</button>
-    </form>
-	<br>
-	
-	<form method="post">
-        <button type="submit" name="cancellations" id="side-buttons">Cancellations</button>
-    </form>
-	<br>
-	
-	<form method="post">
-        <button type="submit" name="guests" id="side-buttons">Guests</button>
-    </form>
-	</div>
-	
-	<div class="side-buttons-bottom">
-	<form method="post">
-        <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>
-    </form>
-	<br>
-	
-    <form method="post">
-        <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
-    </form>
-	<br>
-	
-	<form method="post">
-        <button type="submit" name="book_room" id="side-buttons">Book Room</button>
-    </form>
-	<br>
-	
-	<form method="post">
-        <button type="submit" name="check_in" id="side-buttons">Check In</button>
-    </form>
-	<br>
-	
-	<form method="post">
-        <button type="submit" name="check_out" id="side-buttons">Check Out</button>
-    </form>
-	</div>
+
 </div>
 	<form class="book-room-form" method="post">
 	<h1>BOOK ROOM</h1><br>
@@ -338,92 +251,59 @@ if (isset($_POST['submit_booking'])) {
 		
 		<script>
 		
-		document.addEventListener('DOMContentLoaded', function() {
-			const roomSelect = document.querySelector('select[name="room_num"]');
-			let checkInPicker, checkOutPicker;
-			let unavailableDates = [];
+		// document.addEventListener('DOMContentLoaded', function() {
+			// const roomSelect = document.querySelector('select[name="room_num"]');
+			// let checkInPicker, checkOutPicker;
+			// let unavailableDates = [];
 
-			// Initialize date pickers
-			checkInPicker = flatpickr("#checkin_date", {
-				minDate: "today",
-				disable: unavailableDates,
-				onChange: function(selectedDates) {
-					if (selectedDates[0]) {
-						// Set minimum date for checkout to day after checkin
-						checkOutPicker.set('minDate', selectedDates[0].fp_incr(1));
-						// Clear checkout date when check in changes
-						checkOutPicker.clear();
-					}
-				}
-			});
+			Initialize date pickers
+			// checkInPicker = flatpickr("#checkin_date", {
+				// minDate: "today",
+				// disable: unavailableDates,
+				// onChange: function(selectedDates) {
+					// if (selectedDates[0]) {
+						Set minimum date for checkout to day after checkin
+						// checkOutPicker.set('minDate', selectedDates[0].fp_incr(1));
+						Clear checkout date when check in changes
+						// checkOutPicker.clear();
+					// }
+				// }
+			// });
 
-			checkOutPicker = flatpickr("#checkout_date", {
-				minDate: "today",
-				disable: unavailableDates
-			});
+			// checkOutPicker = flatpickr("#checkout_date", {
+				// minDate: "today",
+				// disable: unavailableDates
+			// });
 
-			roomSelect.addEventListener('change', async function() {
-				const selectedRoom = this.value;
-					if (selectedRoom) {
-						try {
-							const response = await fetch(`check_availability.php?room_num=${selectedRoom}`);
-							const reservations = await response.json();
+			// roomSelect.addEventListener('change', async function() {
+				// const selectedRoom = this.value;
+					// if (selectedRoom) {
+						// try {
+							// const response = await fetch(`check_availability.php?room_num=${selectedRoom}`);
+							// const reservations = await response.json();
                     
-							// Convert reservations to disabled date ranges
-							unavailableDates = reservations.map(res => ({
-								from: new Date(res.checkin_date),
-								to: new Date(res.checkout_date)
-							}));
+							Convert reservations to disabled date ranges
+							// unavailableDates = reservations.map(res => ({
+								// from: new Date(res.checkin_date),
+								// to: new Date(res.checkout_date)
+							// }));
 
-							// Update both date pickers with new disabled dates
-							checkInPicker.set('disable', unavailableDates);
-							checkOutPicker.set('disable', unavailableDates);
+							Update both date pickers with new disabled dates
+							// checkInPicker.set('disable', unavailableDates);
+							// checkOutPicker.set('disable', unavailableDates);
                     
-							// Clear any selected dates
-							checkInPicker.clear();
-							checkOutPicker.clear();
-						} 
+							Clear any selected dates
+							// checkInPicker.clear();
+							// checkOutPicker.clear();
+						// } 
 					
-					catch (error) {
-						console.error('Error fetching unavailable dates:', error);
-					}
-					}
-			});
-		});
-		</script>
-
-		<style>
-		
-		.flatpickr-calendar {
-			background: #fff;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-			border-radius: 4px;
-		}
-
-		.flatpickr-day.flatpickr-disabled {
-			background-color: #e1e3e1 !important;
-			text-decoration: line-through;
-			color: #7a7a7a !important;
-			cursor: not-allowed;
-		}
-
-		.flatpickr-day.selected {
-			background-color: #b5a8e7 !important;
-			border-color: #b5a8e7 !important;
-			color: #fff !important;
-		}
-
-		.flatpickr-day:hover {
-			background-color: #e2dbf7;
-		}
-
-		input[type="text"] {
-			padding: 8px;
-			border: 1px solid #ccc;
-			border-radius: 4px;
-			width: 200px;
-			cursor: pointer;
-		}
-		</style>	
+					// catch (error) {
+						// console.error('Error fetching unavailable dates:', error);
+					// }
+					// }
+			// });
+		// });
+		// </script>
+	
 </body>
 </html>
