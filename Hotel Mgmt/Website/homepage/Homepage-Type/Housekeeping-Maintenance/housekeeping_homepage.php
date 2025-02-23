@@ -1,3 +1,12 @@
+<?php
+
+    if (isset($_POST['placeholder'])) {
+        include('Homepage-Type/Housekeeping-Maintenance/page_template.php');
+    }
+
+	?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,21 +14,12 @@
 </head>
 
 <body>
-    <h1>Housekeeping Portal</h1>
-	
-    <form method="post">
-        <button type="submit" name="admin_1">Housekeeping Function 1</button>
-    </form>
-	<br>
-	
+    <h1>Housekeeper Portal</h1>
+	<div class="side-buttons-container">
+	<div class="side-buttons-top">
 	<form method="post">
-        <button type="submit" name="admin_2">Housekeeping Function 2</button>
+        <button type="submit" name="placeholder" id="side-buttons">Function 1</button>
     </form>
-	<br>
-	
-	<form method="post">
-        <button type="submit" name="admin_3">Housekeeping Function 3</button>
-    </form>
-	
-	
+
 </body>
+</html>
