@@ -1,21 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
-</head>
-
-<body>
-    <h1>Admin Portal</h1>
-
-    <?php
+<?php
 
     if (isset($_POST['register'])) {
         include('Homepage-Type/Admin/registerUser.php');
     }
 	
 	if (isset($_POST['night_audit'])) {
-        header('Homepage-Type/Admin/night_audit.php');
-    }
+		echo "<script>window.open('../../Website/inc/night_audit.php', '_blank');</script>";
+	}
 	
 	if (isset($_POST['select'])) {
         include('Homepage-Type/Admin/selectUsers.php');
@@ -27,30 +18,40 @@
     
 	// Check if update_id is set, then include updateUsers.php
 	if (isset($_GET['update_id'])) {
-		include('homepage-type/admin/updateUsers.php');
+		include('Homepage-Type/admin/updateUsers.php');
 	}
 	?>
-    
-    
 
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
+</head>
+
+<body>
+    <h1>Admin Portal</h1>
+	<div class="side-buttons-container">
+	<div class="side-buttons-top">
     <form method="post">
-        <button type="submit" name="register">Add New User</button>
+        <button type="submit" name="register" id="side-buttons">Add New User</button>
     </form>
-    <br>
     
     <form method="post">
-        <button type="submit" name="select">View Users</button>
+        <button type="submit" name="select" id="side-buttons">View Users</button>
     </form>
-	<br>
 	
 	<form method="post">
-        <button type="submit" name="placeholder">Function 2</button>
+        <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
     </form>
-	<br>
+	<br><br><br>
 	
 	<form method="post">
-        <button type="submit" name="placeholder">Function 3</button>
+        <button type="submit" name="placeholder" id="side-buttons">Function 2</button>
     </form>
-    <br>
+	
+	<form method="post">
+        <button type="submit" name="placeholder" id="side-buttons">Function 3</button>
+    </form>
 </body>
 </html>
