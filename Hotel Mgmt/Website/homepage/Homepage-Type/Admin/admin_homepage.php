@@ -7,7 +7,6 @@
 	if (isset($_POST['night_audit'])) {
 		echo "<script>window.open('../../Website/inc/night_audit.php', '_blank');</script>";
 	}
-
 	
 	if (isset($_POST['select'])) {
         include('Homepage-Type/Admin/selectUsers.php');
