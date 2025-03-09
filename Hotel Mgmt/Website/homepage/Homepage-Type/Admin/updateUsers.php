@@ -49,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_user'])) {
     if (!$password) {
         $error .= "Password can't be blank<br>";
     }
-    
 
     // Display errors if validation fails
     if ($error !== "") {
@@ -72,45 +71,117 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_user'])) {
         $statementUU->closeCursor();
 
         // Redirect back after success
-		header("Location: Homepage.php");
-		exit();
-
+        header("Location: Homepage.php");
+        exit();
     }
 }
 ?>
 
+<style>
+/* Ensure the form does not get covered by the menu */
+.form-container {
+    width: 50%; /* Adjust as needed */
+    max-width: 500px; /* Prevents form from being too wide */
+    margin: 50px auto 50px 230px; /* Pushes the form away from the menu */
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Center the form on smaller screens */
+@media (max-width: 900px) {
+    .form-container {
+        margin-left: auto;
+        margin-right: auto;
+        width: 80%;
+    }
+}
+
+h3 {
+    text-align: center;
+}
+
+table {
+    width: 100%;
+}
+
+td {
+    padding: 10px;
+}
+
+input, select {
+    width: 95%; 
+    padding: 10px;
+    font-size: 18px; 
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[name="username"], input[name="password"] {
+   width: 98%;
+}
+
+/* Style only buttons inside the update form */
+.form-container input[type="submit"], 
+.form-container button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+}
+
+.form-container button {
+    background-color: #dc3545;
+}
+
+.form-container input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.form-container button:hover {
+    background-color: #c82333;
+}
+
+</style>
+
 <!-- Only show the update form if user data is available -->
 <?php if ($user): ?>
-    <h3>Update User ID: <?php echo htmlspecialchars($u_id); ?></h3>
-    <form action="" method="post" id="update_users_form">
-        <input type="hidden" name="uid" value="<?php echo htmlspecialchars($u_id); ?>">
-        <table>
-            <tr>
-                <th>Username:</th>
-                <td><input type="text" name="username" value="<?php echo htmlspecialchars($user["username"] ?? ''); ?>" required></td>
-            </tr>
-            <tr>
-                <th>Password:</th>
-                <td><input type="password" name="password" placeholder="Type New Password Here" required></td>
-            </tr>
-            <tr>
-                <th>Role:</th>
-                <td>
-                    <select name="role" required>
-                        <option value="admin" <?php echo ($user["role"] === "Admin") ? "selected" : ""; ?>>Admin</option>
-						<option value="front_desk" <?php echo ($user["role"] === "Admin") ? "selected" : ""; ?>>Front Desk</option>
-						<option value="maintenance" <?php echo ($user["role"] === "Maintenance") ? "selected" : ""; ?>>Maintenance/Housekeeper</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <br>
-        <input type="submit" name="update_user" value="Update User">
-		<br>
-		<button type="button" onclick="window.location.href='Homepage.php';">CANCEL</button>
-		<br><br>
-
-    </form>
+    <div class="form-container">
+        <h3>Update User ID: <?php echo htmlspecialchars($u_id); ?></h3>
+        <form action="" method="post" id="update_users_form">
+            <input type="hidden" name="uid" value="<?php echo htmlspecialchars($u_id); ?>">
+            <table>
+                <tr>
+                    <th>Username:</th>
+                    <td><input type="text" name="username" value="<?php echo htmlspecialchars($user["username"] ?? ''); ?>" required></td>
+                </tr>
+                <tr>
+                    <th>Password:</th>
+                    <td><input type="password" name="password" placeholder="Type New Password Here" required></td>
+                </tr>
+                <tr>
+                    <th>Role:</th>
+                    <td>
+                        <select name="role" required>
+                            <option value="admin" <?php echo ($user["role"] === "Admin") ? "selected" : ""; ?>>Admin</option>
+                            <option value="front_desk" <?php echo ($user["role"] === "Front Desk") ? "selected" : ""; ?>>Front Desk</option>
+                            <option value="maintenance" <?php echo ($user["role"] === "Maintenance") ? "selected" : ""; ?>>Maintenance</option>
+                            <option value="housekeeper" <?php echo ($user["role"] === "Housekeeper") ? "selected" : ""; ?>>Housekeeper</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <br>
+            <input type="submit" name="update_user" value="Update User">
+            <button type="button" onclick="window.location.href='Homepage.php';">CANCEL</button>
+        </form>
+    </div>
 <?php else: ?>
     <p style="color:red;">User not found.</p>
 <?php endif; ?>

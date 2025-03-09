@@ -7,7 +7,7 @@ if ($status == PHP_SESSION_NONE) {
     session_start();
 }
 if (isset($_SESSION['user'])) {
-    header('Location: index.php'); // Redirect to the home page if already logged in
+    header('Location: homepage/homepage.php'); // Redirect to the home page if already logged in
     exit();
 }
 

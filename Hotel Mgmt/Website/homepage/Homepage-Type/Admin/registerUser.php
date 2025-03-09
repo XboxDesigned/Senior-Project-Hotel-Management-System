@@ -83,7 +83,8 @@ if (isset($_POST['register'])) {
                 <select name="role" required>
                     <option value="admin" <?php echo ($u_role == 'admin') ? 'selected' : ''; ?>>Admin</option>
                     <option value="front_desk" <?php echo ($u_role == 'front_desk') ? 'selected' : ''; ?>>Front Desk</option>
-                    <option value="maintenance" <?php echo ($u_role == 'maintenance') ? 'selected' : ''; ?>>Maintenance/Housekeeper</option>
+                    <option value="maintenance" <?php echo ($u_role == 'maintenance') ? 'selected' : ''; ?>>Maintenance</option>
+                    <option value="housekeeper" <?php echo ($u_role == 'housekeeper') ? 'selected' : ''; ?>>Housekeeper</option>
                 </select>
             </label><br>
 

@@ -30,6 +30,30 @@ $statementUsers->closeCursor();
  			td {
        			padding: 10px 20px; /* Adjust space inside each cell, temporary */
    			}
+			/* Push the table to the right so it's not covered by the menu */
+			table {
+				margin-left: 220px; 
+				width: 80%; 
+				max-width: 1000px; 
+				border-collapse: collapse;
+			}
+
+			th, td {
+				padding: 12px;
+				border: 1px solid #ccc;
+				text-align: left;
+			}
+
+			@media (max-width: 900px) {
+				table {
+					width: 90%;
+					margin-left: auto;
+					margin-right: auto;
+					overflow-x: auto;
+					display: block;
+				}
+			}
+
 		</style>
 	</head>
 	<main>

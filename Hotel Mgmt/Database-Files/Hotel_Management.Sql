@@ -381,4 +381,6 @@ INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status)
 (401, 1, 'Vacuum carpets and dust furniture', 'pending'),
 (222, 1, 'Sanitize high-touch surfaces', 'completed');
 
+INSERT INTO maintenance_tasks (room_num, assigned_to, task_description, status) VALUES
+(501, 11, 'Fix the broken door', 'pending');
 

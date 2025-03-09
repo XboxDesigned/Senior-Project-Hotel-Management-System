@@ -64,6 +64,9 @@ if (isset($_POST['logout']))
             include_once('Homepage-Type/Admin/admin_homepage.php');
             break;
         case 'maintenance':
+            include_once('Homepage-Type/Housekeeping-Maintenance/maintenance_homepage.php');
+            break;
+        case 'housekeeper':
             include_once('Homepage-Type/Housekeeping-Maintenance/housekeeping_homepage.php');
             break;
         default:
