@@ -38,9 +38,8 @@ CREATE TABLE reservations (
     checkout_datetime DATETIME DEFAULT NULL,
     balance DECIMAL(10,2) DEFAULT 0.00,
     room_num INT NOT NULL,
-	nights INT,
+    nights INT,
     status VARCHAR(50) NOT NULL DEFAULT 'active',
-    -- Status can be: 'active', 'pending', 'confirmed', 'canceled', 'checked-in', 'checked-out'
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
     FOREIGN KEY (room_num) REFERENCES rooms(room_num) ON DELETE CASCADE
 );
@@ -52,6 +51,8 @@ CREATE TABLE guest_charges (
     confirmation_num VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
+    date_added DATETIME DEFAULT CURRENT_TIMESTAMP, -- Added column
+    username VARCHAR(50) NOT NULL,                -- Added column
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
     FOREIGN KEY (confirmation_num) REFERENCES reservations(confirmation_num) ON DELETE CASCADE
 );
@@ -64,6 +65,8 @@ CREATE TABLE invoices (
     total_amount DECIMAL(10,2) NOT NULL,
     payment_received DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    date_added DATETIME DEFAULT CURRENT_TIMESTAMP, -- Added column
+    username VARCHAR(50) NOT NULL,                -- Added column
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
     FOREIGN KEY (confirmation_num) REFERENCES reservations(confirmation_num) ON DELETE CASCADE
 );
@@ -88,8 +91,8 @@ CREATE TABLE maintenance_tasks (
     assigned_to INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (room_num) REFERENCES rooms(room_num),
-	FOREIGN KEY (assigned_to) REFERENCES users(u_id)
-	);
+    FOREIGN KEY (assigned_to) REFERENCES users(u_id)
+);
 
 DELIMITER //
 
