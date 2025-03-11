@@ -1,23 +1,18 @@
 <?php
-// Start session to track logged-in user
 session_start();
-
-// Include database connection
 include('../inc/db_connect.php');
 
-// Check if $db is defined and valid
 if (!isset($db) || !$db instanceof PDO) {
     $error = "Database connection failed. Check db_connect.php.";
 }
 
-// Check if user is logged in
 if (!isset($_SESSION['user']) || !isset($_SESSION['user']['username'])) {
     $error = "You must be logged in to access this page.";
-    header('Location: ../login.php'); // Redirect to login if not authenticated
+    header('Location: ../login.php');
     exit();
 }
 
-$logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's username
+$logged_in_username = $_SESSION['user']['username'];
 ?>
 
 <!DOCTYPE html>
@@ -27,51 +22,38 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>In-House Guests</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-            cursor: pointer;
-        }
-        .modal {
-            display: <?php echo isset($_POST['show_guest']) ? 'block' : 'none'; ?>;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 20px;
-            width: 80%;
-            max-width: 600px;
-        }
-        .charges-table, .payments-table, .form-section {
-            margin-top: 20px;
-        }
-        button {
-            margin: 5px;
-            padding: 5px 10px;
-        }
-        .error {
-            color: red;
-            font-weight: bold;
-        }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:hover { background-color: #f5f5f5; cursor: pointer; }
+        .modal { display: <?php echo isset($_POST['show_guest']) ? 'block' : 'none'; ?>; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: white; margin: 5% auto; padding: 20px; width: 80%; max-width: 600px; }
+        .charges-table, .payments-table, .form-section { margin-top: 20px; }
+        button { margin: 5px; padding: 5px 10px; }
+        .error { color: red; font-weight: bold; }
+        .hidden-submit { display: none; }
+        td { pointer-events: auto; }
+        .delete-btn { background-color: #ff4444; color: white; border: none; cursor: pointer; }
+        .delete-btn:hover { background-color: #cc0000; }
     </style>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('.guest-row');
+            rows.forEach(row => {
+                row.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') {
+                        return;
+                    }
+                    const confNum = this.getAttribute('data-conf-num');
+                    const form = document.getElementById('form-' + confNum);
+                    if (form) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="in-house-tab">
@@ -135,8 +117,16 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                             echo "<tr><td colspan='10'>No in-house guests found.</td></tr>";
                         } else {
                             foreach ($result as $row) {
-                                echo "<tr>";
-                                echo "<td><form method='POST' style='margin:0;'><input type='hidden' name='confirmation_num' value='{$row['confirmation_num']}'><button type='submit' name='show_guest' style='background:none;border:none;padding:0;'>{$row['confirmation_num']}</button></form></td>";
+                                $conf_num = htmlspecialchars($row['confirmation_num']);
+                                echo "<tr class='guest-row' data-conf-num='$conf_num'>";
+                                echo "<td>";
+                                echo "<form id='form-$conf_num' method='POST' style='margin:0;'>";
+                                echo "<input type='hidden' name='confirmation_num' value='$conf_num'>";
+                                echo "<input type='hidden' name='show_guest' value='true'>";
+                                echo "<button type='submit' class='hidden-submit'>Show</button>";
+                                echo "$conf_num";
+                                echo "</form>";
+                                echo "</td>";
                                 echo "<td>{$row['first_name']} {$row['last_name']}</td>";
                                 echo "<td>{$row['contact_num']}<br>{$row['email_address']}</td>";
                                 echo "<td>{$row['room_num']}</td>";
@@ -194,8 +184,7 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                             echo "<p><strong>Check-Out:</strong> {$guest_result['checkout_date']}</p>";
                             echo "<p><strong>Balance:</strong> $" . number_format($guest_result['reservation_balance'], 2) . "</p>";
 
-                            // Display charges
-                            $charges_query = "SELECT description, amount, date_added AS date, username FROM guest_charges WHERE confirmation_num = ?";
+                            $charges_query = "SELECT charge_id, description, amount, date_added AS date, username FROM guest_charges WHERE confirmation_num = ?";
                             $statement = $db->prepare($charges_query);
                             if (!$statement) {
                                 echo "<p class='error'>Failed to prepare charges query: " . implode(", ", $db->errorInfo()) . "</p>";
@@ -206,20 +195,31 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                                 echo "<div class='charges-table'>";
                                 echo "<h4>Charges</h4>";
                                 echo "<table id='chargesTable'>";
-                                echo "<thead><tr><th>Description</th><th>Amount</th><th>Date</th><th>Added By</th></tr></thead>";
+                                echo "<thead><tr><th>Description</th><th>Amount</th><th>Date</th><th>Added By</th><th>Action</th></tr></thead>";
                                 echo "<tbody>";
                                 if (empty($charges_result)) {
-                                    echo "<tr><td colspan='4'>No charges found.</td></tr>";
+                                    echo "<tr><td colspan='5'>No charges found.</td></tr>";
                                 } else {
                                     foreach ($charges_result as $charge) {
-                                        echo "<tr><td>{$charge['description']}</td><td>$" . number_format($charge['amount'], 2) . "</td><td>{$charge['date']}</td><td>{$charge['username']}</td></tr>";
+                                        echo "<tr>";
+                                        echo "<td>{$charge['description']}</td>";
+                                        echo "<td>$" . number_format($charge['amount'], 2) . "</td>";
+                                        echo "<td>{$charge['date']}</td>";
+                                        echo "<td>{$charge['username']}</td>";
+                                        echo "<td>";
+                                        echo "<form method='POST' style='display:inline;'>";
+                                        echo "<input type='hidden' name='confirmation_num' value='$conf'>";
+                                        echo "<input type='hidden' name='charge_id' value='{$charge['charge_id']}'>";
+                                        echo "<button type='submit' name='remove_charge' class='delete-btn'>Remove</button>";
+                                        echo "</form>";
+                                        echo "</td>";
+                                        echo "</tr>";
                                     }
                                 }
                                 echo "</tbody></table></div>";
                             }
 
-                            // Display payments
-                            $payments_query = "SELECT payment_received AS amount, date_added AS date, username FROM invoices WHERE confirmation_num = ?";
+                            $payments_query = "SELECT invoice_id, payment_received AS amount, date_added AS date, username FROM invoices WHERE confirmation_num = ?";
                             $statement = $db->prepare($payments_query);
                             if (!$statement) {
                                 echo "<p class='error'>Failed to prepare payments query: " . implode(", ", $db->errorInfo()) . "</p>";
@@ -230,13 +230,24 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                                 echo "<div class='payments-table'>";
                                 echo "<h4>Payments</h4>";
                                 echo "<table id='paymentsTable'>";
-                                echo "<thead><tr><th>Amount</th><th>Date</th><th>Added By</th></tr></thead>";
+                                echo "<thead><tr><th>Amount</th><th>Date</th><th>Added By</th><th>Action</th></tr></thead>";
                                 echo "<tbody>";
                                 if (empty($payments_result)) {
-                                    echo "<tr><td colspan='3'>No payments found.</td></tr>";
+                                    echo "<tr><td colspan='4'>No payments found.</td></tr>";
                                 } else {
                                     foreach ($payments_result as $payment) {
-                                        echo "<tr><td>$" . number_format($payment['amount'], 2) . "</td><td>{$payment['date']}</td><td>{$payment['username']}</td></tr>";
+                                        echo "<tr>";
+                                        echo "<td>$" . number_format($payment['amount'], 2) . "</td>";
+                                        echo "<td>{$payment['date']}</td>";
+                                        echo "<td>{$payment['username']}</td>";
+                                        echo "<td>";
+                                        echo "<form method='POST' style='display:inline;'>";
+                                        echo "<input type='hidden' name='confirmation_num' value='$conf'>";
+                                        echo "<input type='hidden' name='invoice_id' value='{$payment['invoice_id']}'>";
+                                        echo "<button type='submit' name='remove_payment' class='delete-btn'>Remove</button>";
+                                        echo "</form>";
+                                        echo "</td>";
+                                        echo "</tr>";
                                     }
                                 }
                                 echo "</tbody></table></div>";
@@ -252,6 +263,7 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                     <h4>Add Charge</h4>
                     <form method="POST" action="">
                         <input type="hidden" name="confirmation_num" value="<?php echo isset($conf) ? $conf : ''; ?>">
+                        <input type="hidden" name="show_guest" value="true">
                         <label>Description: <input type="text" name="description" required></label><br>
                         <label>Amount: <input type="number" step="0.01" name="amount" required></label><br>
                         <button type="submit" name="add_charge">Add Charge</button>
@@ -262,12 +274,14 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                     <h4>Add Payment</h4>
                     <form method="POST" action="">
                         <input type="hidden" name="confirmation_num" value="<?php echo isset($conf) ? $conf : ''; ?>">
+                        <input type="hidden" name="show_guest" value="true">
                         <label>Amount: <input type="number" step="0.01" name="payment_amount" required></label><br>
                         <button type="submit" name="add_payment">Add Payment</button>
                     </form>
                 </div>
 
                 <form method="POST" action="">
+                    <button type="submit" name="back_to_list">Back</button>
                     <button type="submit" name="close_modal">Close</button>
                 </form>
             </div>
@@ -275,14 +289,13 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
     </div>
 
     <?php
-    // Handle Add Charge
+    // Add Charge
     if (isset($_POST['add_charge']) && !isset($error)) {
         $confirmation_num = $_POST['confirmation_num'];
         $description = $_POST['description'];
         $amount = $_POST['amount'];
-        $username = $logged_in_username; // Use logged-in user's username
+        $username = $logged_in_username;
 
-        // Get guest_id
         $guest_query = "SELECT guest_id FROM reservations WHERE confirmation_num = ?";
         $statement = $db->prepare($guest_query);
         if (!$statement) {
@@ -299,7 +312,12 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                     echo "<p class='error'>Failed to prepare charge insertion: " . implode(", ", $db->errorInfo()) . "</p>";
                 } else {
                     $statement->execute([$guest_id, $confirmation_num, $description, $amount, $username]);
-                    echo "<meta http-equiv='refresh' content='0;url=in_house.php?show_guest=$confirmation_num'>";
+                    // Refresh with POST
+                    echo "<form id='refreshForm' method='POST' action='in_house.php'>";
+                    echo "<input type='hidden' name='confirmation_num' value='$confirmation_num'>";
+                    echo "<input type='hidden' name='show_guest' value='true'>";
+                    echo "</form>";
+                    echo "<script>document.getElementById('refreshForm').submit();</script>";
                 }
             } else {
                 echo "<p class='error'>Guest ID not found for charge.</p>";
@@ -307,13 +325,12 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
         }
     }
 
-    // Handle Add Payment
+    // Add Payment
     if (isset($_POST['add_payment']) && !isset($error)) {
         $confirmation_num = $_POST['confirmation_num'];
         $payment_amount = $_POST['payment_amount'];
-        $username = $logged_in_username; // Use logged-in user's username
+        $username = $logged_in_username;
 
-        // Get guest_id
         $guest_query = "SELECT guest_id FROM reservations WHERE confirmation_num = ?";
         $statement = $db->prepare($guest_query);
         if (!$statement) {
@@ -323,7 +340,6 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
             $guest_id = $statement->fetch(PDO::FETCH_ASSOC)['guest_id'];
 
             if ($guest_id) {
-                // Insert new payment record (no aggregation)
                 $sql = "INSERT INTO invoices (guest_id, confirmation_num, total_amount, payment_received, username, date_added) 
                         VALUES (?, ?, ?, ?, ?, NOW())";
                 $statement = $db->prepare($sql);
@@ -331,15 +347,18 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
                     echo "<p class='error'>Failed to prepare invoice insertion: " . implode(", ", $db->errorInfo()) . "</p>";
                 } else {
                     $statement->execute([$guest_id, $confirmation_num, $payment_amount, $payment_amount, $username]);
-
-                    // Update reservation balance
                     $update_sql = "UPDATE reservations SET balance = balance - ? WHERE confirmation_num = ?";
                     $statement = $db->prepare($update_sql);
                     if (!$statement) {
                         echo "<p class='error'>Failed to prepare balance update: " . implode(", ", $db->errorInfo()) . "</p>";
                     } else {
                         $statement->execute([$payment_amount, $confirmation_num]);
-                        echo "<meta http-equiv='refresh' content='0;url=in_house.php?show_guest=$confirmation_num'>";
+                        // Refresh with POST
+                        echo "<form id='refreshForm' method='POST' action='in_house.php'>";
+                        echo "<input type='hidden' name='confirmation_num' value='$confirmation_num'>";
+                        echo "<input type='hidden' name='show_guest' value='true'>";
+                        echo "</form>";
+                        echo "<script>document.getElementById('refreshForm').submit();</script>";
                     }
                 }
             } else {
@@ -348,18 +367,67 @@ $logged_in_username = $_SESSION['user']['username']; // Get the logged-in user's
         }
     }
 
-    // Handle Show Guest from URL parameter
-    if (isset($_GET['show_guest'])) {
-        echo "<script>document.getElementById('guestDetailsModal').style.display = 'block';</script>";
-        $_POST['show_guest'] = true;
-        $_POST['confirmation_num'] = $_GET['show_guest'];
+    // Remove Charge
+    if (isset($_POST['remove_charge']) && !isset($error)) {
+        $confirmation_num = $_POST['confirmation_num'];
+        $charge_id = $_POST['charge_id'];
+
+        $sql = "DELETE FROM guest_charges WHERE charge_id = ? AND confirmation_num = ?";
+        $statement = $db->prepare($sql);
+        if (!$statement) {
+            echo "<p class='error'>Failed to prepare charge deletion: " . implode(", ", $db->errorInfo()) . "</p>";
+        } else {
+            $statement->execute([$charge_id, $confirmation_num]);
+            // Refresh with POST
+            echo "<form id='refreshForm' method='POST' action='in_house.php'>";
+            echo "<input type='hidden' name='confirmation_num' value='$confirmation_num'>";
+            echo "<input type='hidden' name='show_guest' value='true'>";
+            echo "</form>";
+            echo "<script>document.getElementById('refreshForm').submit();</script>";
+        }
     }
 
-    // Handle Close Modal
-    if (isset($_POST['close_modal'])) {
+    // Remove Payment
+    if (isset($_POST['remove_payment']) && !isset($error)) {
+        $confirmation_num = $_POST['confirmation_num'];
+        $invoice_id = $_POST['invoice_id'];
+
+        $payment_query = "SELECT payment_received FROM invoices WHERE invoice_id = ? AND confirmation_num = ?";
+        $statement = $db->prepare($payment_query);
+        if ($statement) {
+            $statement->execute([$invoice_id, $confirmation_num]);
+            $payment = $statement->fetch(PDO::FETCH_ASSOC);
+            $payment_amount = $payment['payment_received'];
+
+            $sql = "DELETE FROM invoices WHERE invoice_id = ? AND confirmation_num = ?";
+            $statement = $db->prepare($sql);
+            if (!$statement) {
+                echo "<p class='error'>Failed to prepare payment deletion: " . implode(", ", $db->errorInfo()) . "</p>";
+            } else {
+                $statement->execute([$invoice_id, $confirmation_num]);
+                $update_sql = "UPDATE reservations SET balance = balance + ? WHERE confirmation_num = ?";
+                $statement = $db->prepare($update_sql);
+                if (!$statement) {
+                    echo "<p class='error'>Failed to prepare balance update: " . implode(", ", $db->errorInfo()) . "</p>";
+                } else {
+                    $statement->execute([$payment_amount, $confirmation_num]);
+                    // Refresh with POST
+                    echo "<form id='refreshForm' method='POST' action='in_house.php'>";
+                    echo "<input type='hidden' name='confirmation_num' value='$confirmation_num'>";
+                    echo "<input type='hidden' name='show_guest' value='true'>";
+                    echo "</form>";
+                    echo "<script>document.getElementById('refreshForm').submit();</script>";
+                }
+            }
+        } else {
+            echo "<p class='error'>Failed to prepare payment query: " . implode(", ", $db->errorInfo()) . "</p>";
+        }
+    }
+
+    // Handle Back and Close
+    if (isset($_POST['back_to_list']) || isset($_POST['close_modal'])) {
         echo "<meta http-equiv='refresh' content='0;url=in_house.php'>";
     }
     ?>
-
 </body>
 </html>
