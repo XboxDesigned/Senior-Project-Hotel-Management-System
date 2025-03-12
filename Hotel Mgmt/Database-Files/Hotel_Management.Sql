@@ -94,57 +94,41 @@ CREATE TABLE maintenance_tasks (
     FOREIGN KEY (assigned_to) REFERENCES users(u_id)
 );
 
+-- Stored Procedure: night_audit()
+
 DELIMITER //
 
 CREATE PROCEDURE night_audit()
 BEGIN
-    -- Temporary table for reservation updates
+    -- Create a temporary table for reservation updates
     CREATE TEMPORARY TABLE temp_reservations AS 
     SELECT guest_id, confirmation_num, room_num, balance, status, checkin_date 
     FROM reservations;
 
-    -- 1. Charge guests for each night stayed
-    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
-    SELECT t.guest_id, t.confirmation_num, 'Nightly Room Charge', rm.rate_plan
+    -- 1. Charge guests for each night stayed under 'System' (matching in_house.php format)
+    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount, username, date_added)
+    SELECT t.guest_id, t.confirmation_num, 'Nightly Room Charge', rm.rate_plan, 'System', NOW()
     FROM temp_reservations t
     JOIN rooms rm ON t.room_num = rm.room_num
     WHERE t.status = 'checked-in';
 
-    -- 2. Update reservation balances
-    UPDATE reservations r
-    JOIN rooms rm ON r.room_num = rm.room_num
-    SET r.balance = r.balance + rm.rate_plan
-    WHERE r.status = 'checked-in';
-
-    -- 3. Charge no-shows
-    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
-    SELECT t.guest_id, t.confirmation_num, 'No-Show Fee', rm.rate_plan
+    -- 2. Charge no-shows under 'System' (matching in_house.php format)
+    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount, username, date_added)
+    SELECT t.guest_id, t.confirmation_num, 'No-Show Fee', rm.rate_plan, 'System', NOW()
     FROM temp_reservations t
     JOIN rooms rm ON t.room_num = rm.room_num
     WHERE t.checkin_date = CURDATE() AND t.status = 'no-show';
 
-    -- 4. Update reservation balances for no-shows
-    UPDATE reservations r
-    JOIN rooms rm ON r.room_num = rm.room_num
-    SET r.balance = r.balance + rm.rate_plan
-    WHERE r.checkin_date = CURDATE() AND r.status = 'no-show';
+    -- 3. Mark rooms as pending for housekeeping
+    UPDATE rooms
+    SET room_status = 'pending'
+    WHERE room_num IN (
+        SELECT room_num FROM reservations
+        WHERE (checkout_date = CURDATE() OR DATE(checkout_datetime) = CURDATE())
+        AND status = 'checked-out'
+    );
 
-    -- 5. Store charges separately
-    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount)
-    SELECT t.guest_id, t.confirmation_num, 'Final Night Audit Charge', t.balance
-    FROM temp_reservations t
-    WHERE t.status IN ('checked-in', 'no-show');
-
-    -- 6. Mark rooms as pending for housekeeping
-	UPDATE rooms
-	SET room_status = 'pending'
-	WHERE room_num IN (
-    SELECT room_num FROM reservations
-    WHERE (checkout_date = CURDATE() OR DATE(checkout_datetime) = CURDATE())
-    AND status = 'checked-out'
-	);
-
-    -- 7. Generate High Balance Report
+    -- 4. Generate High Balance Report (this SELECT returns the result set to the caller)
     SELECT t.confirmation_num, t.guest_id, g.first_name, g.last_name, t.room_num, t.balance
     FROM temp_reservations t
     JOIN guests g ON t.guest_id = g.guest_id
@@ -157,50 +141,129 @@ END //
 DELIMITER ;
 
 
--- Trigger to update reservations.balance when a charge is inserted
+-- Drop existing triggers (if any) to replace them
+
+DROP TRIGGER IF EXISTS after_guest_charge_insert;
+DROP TRIGGER IF EXISTS after_guest_charge_delete;
+DROP TRIGGER IF EXISTS after_guest_charge_update;
+DROP TRIGGER IF EXISTS after_invoice_insert;
+DROP TRIGGER IF EXISTS after_invoice_delete;
+
+
+-- Trigger: After Inserting a Guest Charge
 DELIMITER $$
 CREATE TRIGGER after_guest_charge_insert
 AFTER INSERT ON guest_charges
 FOR EACH ROW
 BEGIN
-    UPDATE reservations
-    SET balance = (SELECT IFNULL(SUM(amount), 0) FROM guest_charges WHERE confirmation_num = NEW.confirmation_num)
-    WHERE confirmation_num = NEW.confirmation_num;
+    UPDATE reservations r
+    SET r.balance = (
+        (SELECT IFNULL(SUM(amount), 0)
+         FROM guest_charges
+         WHERE confirmation_num = NEW.confirmation_num)
+      - (SELECT IFNULL(SUM(payment_received), 0)
+         FROM invoices
+         WHERE confirmation_num = NEW.confirmation_num)
+    )
+    WHERE r.confirmation_num = NEW.confirmation_num;
 END$$
 DELIMITER ;
 
--- Trigger to update reservations.balance when a charge is deleted
+-- Trigger: After Deleting a Guest Charge
 DELIMITER $$
 CREATE TRIGGER after_guest_charge_delete
 AFTER DELETE ON guest_charges
 FOR EACH ROW
 BEGIN
-    UPDATE reservations
-    SET balance = (SELECT IFNULL(SUM(amount), 0) FROM guest_charges WHERE confirmation_num = OLD.confirmation_num)
-    WHERE confirmation_num = OLD.confirmation_num;
+    UPDATE reservations r
+    SET r.balance = (
+        (SELECT IFNULL(SUM(amount), 0)
+         FROM guest_charges
+         WHERE confirmation_num = OLD.confirmation_num)
+      - (SELECT IFNULL(SUM(payment_received), 0)
+         FROM invoices
+         WHERE confirmation_num = OLD.confirmation_num)
+    )
+    WHERE r.confirmation_num = OLD.confirmation_num;
 END$$
 DELIMITER ;
 
--- Trigger to update reservations.balance when a charge is updated
+-- Trigger: After Updating a Guest Charge
 DELIMITER $$
 CREATE TRIGGER after_guest_charge_update
 AFTER UPDATE ON guest_charges
 FOR EACH ROW
 BEGIN
-    UPDATE reservations
-    SET balance = (SELECT IFNULL(SUM(amount), 0) FROM guest_charges WHERE confirmation_num = NEW.confirmation_num)
-    WHERE confirmation_num = NEW.confirmation_num;
+    UPDATE reservations r
+    SET r.balance = (
+        (SELECT IFNULL(SUM(amount), 0)
+         FROM guest_charges
+         WHERE confirmation_num = NEW.confirmation_num)
+      - (SELECT IFNULL(SUM(payment_received), 0)
+         FROM invoices
+         WHERE confirmation_num = NEW.confirmation_num)
+    )
+    WHERE r.confirmation_num = NEW.confirmation_num;
 END$$
 DELIMITER ;
 
--- View to check mismatches between reservations.balance and actual guest charges
-CREATE VIEW balance_mismatch AS
-SELECT r.reservation_id, r.confirmation_num, r.balance AS recorded_balance, IFNULL(SUM(gc.amount), 0) AS computed_balance
-FROM reservations r
-LEFT JOIN guest_charges gc ON r.confirmation_num = gc.confirmation_num
-GROUP BY r.reservation_id, r.confirmation_num, r.balance
-HAVING r.balance <> computed_balance;
+-- Trigger: After Inserting an Payment
+DELIMITER $$
+CREATE TRIGGER after_invoice_insert
+AFTER INSERT ON invoices
+FOR EACH ROW
+BEGIN
+    UPDATE reservations r
+    SET r.balance = (
+        (SELECT IFNULL(SUM(amount), 0)
+         FROM guest_charges
+         WHERE confirmation_num = NEW.confirmation_num)
+      - (SELECT IFNULL(SUM(payment_received), 0)
+         FROM invoices
+         WHERE confirmation_num = NEW.confirmation_num)
+    )
+    WHERE r.confirmation_num = NEW.confirmation_num;
+END$$
+DELIMITER ;
 
+-- Trigger: After Deleting an Payment
+DELIMITER $$
+CREATE TRIGGER after_invoice_delete
+AFTER DELETE ON invoices
+FOR EACH ROW
+BEGIN
+    UPDATE reservations r
+    SET r.balance = (
+        (SELECT IFNULL(SUM(amount), 0)
+         FROM guest_charges
+         WHERE confirmation_num = OLD.confirmation_num)
+      - (SELECT IFNULL(SUM(payment_received), 0)
+         FROM invoices
+         WHERE confirmation_num = OLD.confirmation_num)
+    )
+    WHERE r.confirmation_num = OLD.confirmation_num;
+END$$
+DELIMITER ;
+
+
+-- View: Check for Balance Mismatches
+
+DROP VIEW IF EXISTS balance_mismatch;
+CREATE VIEW balance_mismatch AS
+SELECT 
+    r.reservation_id, 
+    r.confirmation_num, 
+    r.balance AS recorded_balance, 
+    (
+        (SELECT IFNULL(SUM(amount), 0)
+         FROM guest_charges
+         WHERE confirmation_num = r.confirmation_num)
+      - (SELECT IFNULL(SUM(payment_received), 0)
+         FROM invoices
+         WHERE confirmation_num = r.confirmation_num)
+    ) AS computed_balance
+FROM reservations r
+HAVING recorded_balance <> computed_balance;
 
 
 -- Insert user
