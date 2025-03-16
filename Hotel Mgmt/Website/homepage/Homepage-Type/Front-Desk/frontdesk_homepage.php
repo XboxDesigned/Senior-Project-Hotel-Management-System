@@ -1,38 +1,45 @@
 <?php
+
 if (isset($_POST['home'])) {
   include('Homepage-Type/Front-Desk/page_template.php');
 }
 
-if (isset($_POST['rooms'])) {
-  include('Homepage-Type/Front-Desk/page_template.php');
+else if (isset($_POST['rooms'])) {
+  include('Homepage-Type/Front-Desk/rooms.php');
 }
 
-if (isset($_POST['cancellations'])) {
-  include('Homepage-Type/Front-Desk/page_template.php');
+else if (isset($_POST['cancellations'])) {
+  include('Homepage-Type/Front-Desk/cancellations.php');
 }
 
-if (isset($_POST['guests'])) {
+else if (isset($_POST['guests'])) {
   include('Homepage-Type/Front-Desk/guests.php');
 }
 
-if (isset($_POST['maintenance'])) {
+else if (isset($_POST['maintenance'])) {
   include('Homepage-Type/Front-Desk/page_template.php');
 }
 
-if (isset($_POST['night_audit'])) {
+else if (isset($_POST['night_audit'])) {
+	include('Homepage-Type/Front-Desk/night_audit.php');
   echo "<script>window.open('../../Website/inc/night_audit.php', '_blank');</script>";
 }
 
-if (isset($_POST['book_room'])) {
+else if (isset($_POST['book_room'])) {
   include('Homepage-Type/Front-Desk/book_room.php');
 }
 
-if (isset($_POST['check_in'])) {
+else if (isset($_POST['check_in'])) {
   include('Homepage-Type/Front-Desk/check_in.php');
 }
 
-if (isset($_POST['check_out'])) {
+else if (isset($_POST['check_out'])) {
   include('Homepage-Type/Front-Desk/check_out.php');
+}
+
+else
+{
+	include('Homepage-Type/Front-Desk/page_template.php');
 }
 
 ?>
@@ -44,8 +51,7 @@ if (isset($_POST['check_out'])) {
 </head>
 
 <body>
-    <h1>Front Desk Portal</h1>
-	
+
     <div class="side-buttons-container">
 	<div class="side-buttons-top">
 	<form method="post">
@@ -65,6 +71,7 @@ if (isset($_POST['check_out'])) {
     </form>
 	</div>
 	
+
 	<div class="side-buttons-bottom">
 	<form method="post">
         <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>

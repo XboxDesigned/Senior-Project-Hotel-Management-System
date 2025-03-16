@@ -178,20 +178,11 @@ if (isset($_POST['submit_booking'])) {
 <html>
 <head>
 	<title>Book Room</title>
-	<link rel="stylesheet" type="text/css" href="../../../inc/homepage_main.css">
 
     <!-- Add Flatpickr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 </head>
-<header>
-	<h2>Hello, <?php echo htmlspecialchars($name); ?></h2>
 
-	<!-- Logout Button -->
-	<form method="post">
-		<button type="submit" name="logout" id="submit" class="logout-register-btn">LOGOUT</button><br>
-	</form>
-
-</header>
 <body>
 
 </div>
