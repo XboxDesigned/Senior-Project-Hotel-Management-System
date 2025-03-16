@@ -17,6 +17,7 @@ header {
     top: 0;
     left: 0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+	z-index: 50;
 }
 
 h1 {
@@ -32,6 +33,7 @@ h2 {
     position: absolute;
     color: white;
     font-weight: 200;
+	bottom: -15%;
 }
 
 input {
@@ -51,25 +53,27 @@ label {
     margin-left: 0;
 }
 
-.logout-register-btn-container {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    margin-top: 10px;
+
+.logout-button-container {
+    position: fixed;
+    height: 0%;
+    width: 10%;
+    top: 2.5%;
+    right: 0;
+    z-index: 10;
 }
 
-.logout-register-btn {
-    background-color: #b5a8e7;
-    color: white;
-    padding: 0.5%;
-    font-size: 85%;
+#logout-button {
+    background-color: white;
+    color: black;
+    padding: 8%;
+    width: 75%;
     cursor: pointer;
-    border-radius: 15px;
-    border: 1.5px solid black;
-    width: auto;
-    z-index: 2;
-    pointer-events: auto; 
+    border-radius: 5px;
+    margin-left: 30%;
+    font-family: 'Roboto', sans-serif;
 }
+
 
 .side-buttons-top {
     margin-top: 20%;
@@ -105,21 +109,42 @@ label {
     font-family: 'Roboto', sans-serif;
 }
 
-.check-in-out-form {
-    position: relative;
-    top: 10%;
-    margin-left: 0;
-    text-align: center;
-    padding: 1rem; 
+
+.query-buttons-top {
+    margin-top: 20%;
+    width: 60%;
+    font-size: 90%;
+	right: 10;
 }
 
-.book-room-form {
-    position: relative;
-    top: 10%;
-    margin-left: 0;
-    text-align: center;
-    padding: 1rem; 
+.query-buttons-bottom {
+    margin-top: 60%;
+    width: 60%;
+    font-size: 90%;
 }
+
+.query-buttons-container {
+    position: fixed;
+    background-color: #b5a8e7;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    height: 90%;
+    width: 15%;
+    top: 10%;
+    right: 0;
+    z-index: 10;
+}
+
+#query-buttons {
+    background-color: white;
+    color: black;
+    padding: 3%;
+    width: 80%;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-left: 10%;
+    font-family: 'Roboto', sans-serif;
+}
+
 
 .error {
     font-size: 1.5rem;
@@ -143,4 +168,107 @@ label {
 .message {
     font-weight: bold;
     margin-top: 10px;
+}
+
+
+.table {
+    width: 60%;
+    margin: 20px auto;
+    background-color: transparent;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: transparent;
+}
+
+table th,
+table td {
+    padding: 6px 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+table th {
+    background-color: #9887d5;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+table tr:nth-child(even) {
+    background-color: rgba(248, 246, 253, 0.5);
+}
+
+table tr:hover {
+    background-color: rgba(224, 217, 249, 0.5);
+}
+
+table td {
+    border-bottom: 1px solid #ddd;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: transparent;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 10%;
+}
+
+.error {
+    color: red;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.success {
+    color: green;
+    font-size: 1rem;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.table-button {
+    background-color: #9887d5;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.table-button:hover {
+    background-color: #7a6bb2;
+}
+
+.table-button:active {
+    background-color: #5c4f8a;
+}
+
+.table-button + .table-button {
+    margin-left: 5px;
+}
+
+
+.book-room-form {
+    position: relative;
+    top: 10%;
+    margin-left: 0;
+    text-align: center;
+    padding: 1rem; 
 }
