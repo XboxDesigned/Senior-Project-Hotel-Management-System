@@ -267,19 +267,20 @@ HAVING recorded_balance <> computed_balance;
 
 
 -- Insert user
+-- all user passwords are ''password''
 INSERT INTO users (username, password, role) VALUES 
-('Nicholas Frischkorn', 'hashed_password', 'admin'),
-('Mark Feick', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'admin'), -- hashed password is "admin"
-('Lyubomir Dimitrov', 'hashed_password', 'admin'),
-('Skyler Dipofi', 'hashed_password', 'admin'),
-('Michael Anderson', 'hashed_password', 'admin'),
-('Sarah Williams', 'hashed_password', 'receptionist'),
-('David McGubin', 'hashed_password', 'housekeeper'),
-('Laura Taylor', 'hashed_password', 'receptionist'),
-('James Goober', 'hashed_password', 'housekeeper'),
-('Admin', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'admin'),
-('Maintenance', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'maintenance'),
-('Front_Desk', '$2y$10$A1DvR4BCecOYOYHyh5InE.tPgeqb8fvVYMFJbGFsEXSHYLiKZWDEa', 'front_desk');
+('Nicholas Frischkorn', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'), 
+('Mark Feick', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'), -- hashed password is "admin"
+('Lyubomir Dimitrov', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
+('Skyler Dipofi', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
+('Michael Anderson', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
+('Sarah Williams', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'receptionist'),
+('David McGubin', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'housekeeper'),
+('Laura Taylor', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'receptionist'),
+('James Goober', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'housekeeper'),
+('Admin', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
+('Maintenance', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'maintenance'),
+('Front_Desk', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'front_desk');
 
 
 
