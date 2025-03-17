@@ -69,9 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_user'])) {
         $statementUU->bindValue(':role', $role);
         $statementUU->execute();
         $statementUU->closeCursor();
-
+        //vardump($username);
         // Redirect back after success
-        header("Location: Homepage.php");
+        header("Location: homepage.php");
         exit();
     }
 }
@@ -179,8 +179,9 @@ input[name="username"], input[name="password"] {
             </table>
             <br>
             <input type="submit" name="update_user" value="Update User">
-            <button type="button" onclick="window.location.href='Homepage.php';">CANCEL</button>
+            
         </form>
+        <button type="button" onclick="window.location.href='Homepage.php';">CANCEL</button>
     </div>
 <?php else: ?>
     <p style="color:red;">User not found.</p>

@@ -2,9 +2,12 @@
 //NOT COMPLETE
 
 // Handle page switching
-if (isset($_POST['view_tasks'])) {
+if (isset($_POST['home'])) {
+    header('maintenance_homepage.php');
+}else if (isset($_POST['view_tasks'])) {
     include('view_tasks.php');
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +26,8 @@ if (isset($_POST['view_tasks'])) {
             color: black; /* Ensure title is visible */
         }
     </style>
-</head>
+    
+   </head>
 
 <body>
     <h1>Maintenance Portal</h1>

@@ -1,9 +1,6 @@
 <?php
 
-    // If any button is clicked, clear update_id (acts as cancel)
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        unset($_GET['update_id']); // Remove update_id
-    }
+    
 
     if (isset($_POST['register'])) {
         include('Homepage-Type/Admin/registerUser.php');

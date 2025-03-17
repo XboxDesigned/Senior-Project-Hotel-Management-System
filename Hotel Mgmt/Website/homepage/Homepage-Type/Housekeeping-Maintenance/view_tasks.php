@@ -31,9 +31,10 @@ if (isset($_GET['update_id'])) {
         $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $stmt->closeCursor();
-        // Redirect to the maintenance homepage with view_tasks=1 and clear update_id from the URL
-        header("Location: homepage.php");
-        exit();
+        
+       
+
+        //exit();
     }
 }
 
@@ -82,6 +83,7 @@ $stmt->closeCursor();
     </style>
 </head>
 <main>
+    
 <body>
     <div id="data">
          <h3>Select an option:</h3>
@@ -104,7 +106,7 @@ $stmt->closeCursor();
             <td>
                 <?php if ($task['status'] !== 'completed'): ?>
                     <button>
-                        <a href="homepage.php?view_tasks=1&update_id=<?php echo $task['task_id']; ?>">Complete Task</a>
+                        <a href="?view_tasks=1&update_id=<?php echo $task['task_id']; ?>">Complete Task</a>
                     </button>
                 <?php else: ?>
                     Completed
