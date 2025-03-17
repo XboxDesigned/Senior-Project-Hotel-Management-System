@@ -21,7 +21,7 @@ if (isset($_POST['check_out']) && isset($_POST['guest_id'])) {
 
     if ($guest) {
 
-        $updateQuery = "UPDATE reservations SET status = 'checked-out' WHERE guest_id = :guest_id";
+        $updateQuery = "UPDATE reservations SET status = 'checked-out', checkout_date = CURDATE() WHERE guest_id = :guest_id";
         $stmt = $db->prepare($updateQuery);
         $stmt->bindValue(':guest_id', $guest_id, PDO::PARAM_INT);
 

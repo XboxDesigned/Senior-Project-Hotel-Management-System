@@ -1,7 +1,7 @@
 <?php
 
 if (isset($_POST['home'])) {
-  include('Homepage-Type/Front-Desk/page_template.php');
+  include('../../Website/inc/dashboard.php');
 }
 
 else if (isset($_POST['rooms'])) {
@@ -39,7 +39,7 @@ else if (isset($_POST['check_out'])) {
 
 else
 {
-	include('Homepage-Type/Front-Desk/page_template.php');
+	include('../../Website/inc/dashboard.php');
 }
 
 ?>
@@ -47,7 +47,7 @@ else
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
+
 </head>
 
 <body>
