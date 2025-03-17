@@ -44,38 +44,20 @@ if (isset($_POST['homepage'])) {
 	}
 }
 
+if (isset($_POST['in_house'])) {
+  header('Location: in_house.php');
+}
+
 if (isset($_POST['rooms'])) {
-  header('Homepage-Type/Front-Desk/page_template.php');
+  header('Location: ../homepage/Homepage-Type/Front-Desk/rooms.php');
 }
 
-if (isset($_POST['cancellations'])) {
-  header('Location: ../homepage/Homepage-Type/Front-Desk/cancellations.php');
-}
-
-if (isset($_POST['guests'])) {
-  header('Location: ../homepage/Homepage-Type/Front-Desk/guests.php');
-}
-
-if (isset($_POST['maintenance'])) {
-  header('Homepage-Type/Housekeeping-Maintenance/maintenance_homepage.php');
-}
-
-if (isset($_POST['night_audit'])) {
-  echo "<script>window.open('night_audit.php', '_blank');</script>";
+if (isset($_POST['charge_manager'])) {
+  header('Location: charge_manager.php');
 }
 
 if (isset($_POST['book_room'])) {
     header('Location: ../homepage/Homepage-Type/Front-Desk/book_room.php');
-  exit;
-}
-
-if (isset($_POST['check_in'])) {
-  header('Location: ../homepage/Homepage-Type/Front-Desk/check_in.php');
-  exit;
-}
-
-if (isset($_POST['check_out'])) {
-    header('Location: ../homepage/Homepage-Type/Front-Desk/check_out.php');
   exit;
 }
 
@@ -360,9 +342,9 @@ $pending_tasks_count = $housekeeping_count + $maintenance_tasks_count;
 <div class="side-buttons-container">
     <div class="side-buttons-top">
         <form method="post"><button type="submit" name="homepage" id="side-buttons">Homepage</button></form><br>
+		<form method="post"><button type="submit" name="in_house" id="side-buttons">In House</button></form><br>
         <form method="post"><button type="submit" name="rooms" id="side-buttons">Rooms</button></form><br>
-        <form method="post"><button type="submit" name="cancellations" id="side-buttons">Cancellations</button></form><br>
-        <form method="post"><button type="submit" name="guests" id="side-buttons">Guests</button></form>
+        <form method="post"><button type="submit" name="charge_manager" id="side-buttons">Charge Manager</button></form><br>
     </div>
 </div>
 
