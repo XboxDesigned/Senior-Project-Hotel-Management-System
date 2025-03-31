@@ -19,7 +19,7 @@
 		include('Homepage-Type/admin/updateUsers.php');
 	}
 	
-	if (isset($_POST['home'])) {
+if (isset($_POST['home'])) {
   include('../../Website/inc/dashboard.php');
 }
 
@@ -37,6 +37,14 @@ else if (isset($_POST['guests'])) {
 
 else if (isset($_POST['maintenance'])) {
   include('Homepage-Type/Front-Desk/page_template.php');
+}
+
+else if (isset($_POST['housekeeping'])) {
+  include('Homepage-Type/Front-Desk/page_template.php');
+}
+
+else if (isset($_POST['modify'])) {
+  include('Homepage-Type/Front-Desk/modify_reservation.php');
 }
 
 else if (isset($_POST['night_audit'])) {
@@ -59,7 +67,7 @@ else if (isset($_POST['check_out'])) {
 else
 {
 }
-	?>
+?>
 
 
 
@@ -100,17 +108,6 @@ else
 	
 
 	<div class="side-buttons-bottom">
-	<form method="post">
-        <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>
-    </form>
-	
-    <form method="post">
-        <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
-    </form>
-	
-	<form method="post">
-        <button type="submit" name="book_room" id="side-buttons">Book Room</button>
-    </form>
 	
 	<form method="post">
         <button type="submit" name="check_in" id="side-buttons">Check In</button>
@@ -119,7 +116,24 @@ else
 	<form method="post">
         <button type="submit" name="check_out" id="side-buttons">Check Out</button>
     </form>
+
+	<form method="post">
+        <button type="submit" name="modify" id="side-buttons">Modify Reservation</button>
+    </form>
+
+	<form method="post">
+        <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>
+    </form>
+	
+	<form method="post">
+        <button type="submit" name="housekeeping" id="side-buttons">Housekeeping</button>
+    </form>
+	
+    <form method="post">
+        <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
+    </form>
 	</div>
+	
 	
 </body>
 </html>
