@@ -369,18 +369,7 @@ $pending_tasks_count = $housekeeping_count + $maintenance_tasks_count;
         </div>
     </div>
     
-    <div class="action-buttons">
-        <form method="post">
-            <button type="submit" name="walk_in" class="action-button">Walk-In</button>
-        </form>
-        <form method="post">
-            <button type="submit" name="book_room" class="action-button">New Booking</button>
-        </form>
-        <form method="post">
-            <button type="submit" name="search_reservation" class="action-button">Search Reservation</button>
-        </form>
-    </div>
-</div>
+  
 
     <script>
         // Set current date
