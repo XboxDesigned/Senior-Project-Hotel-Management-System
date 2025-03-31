@@ -29,16 +29,22 @@ $role = $_SESSION['user']['role'];
 <head>
     <title>Home Page</title>
     <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
-</head>
+	</head>
 <body>
 
 
     <header>
         <h2>Hello, <?php echo htmlspecialchars($name); ?></h2>
 		
-        <form method="post" class="logout-button-container">
-            <button type="submit" name="logout" class="logout-button">LOGOUT</button>
-        </form>
+			<button class="image-button">
+				<img src="../../Website/images/hotel_icon.png" alt="hotel-img" class="hotel-logo">
+			</button>
+		
+        <div class="logout-register-btn-container">
+            <form method="post">
+                <button type="submit" name="logout" class="logout-register-btn">Logout</button>
+            </form>
+        </div>
     </header>
 
 
