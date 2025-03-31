@@ -58,7 +58,6 @@ else if (isset($_POST['check_out'])) {
 
 else
 {
-	include('../../Website/inc/dashboard.php');
 }
 	?>
 
@@ -67,11 +66,11 @@ else
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
+   
 </head>
 
 <body>
-    <h1>Admin Portal</h1>
+
 	<div class="side-buttons-container">
 	<div class="side-buttons-top">
     <form method="post">
