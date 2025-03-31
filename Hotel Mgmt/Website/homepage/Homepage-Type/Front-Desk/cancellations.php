@@ -24,6 +24,9 @@ try {
 <!DOCTYPE html>
 <html>
 <head>
+<style>
+        .hidden { display: none; }
+    </style>
     
 </head>
 <body>

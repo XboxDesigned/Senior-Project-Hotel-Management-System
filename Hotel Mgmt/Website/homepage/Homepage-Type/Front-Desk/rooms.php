@@ -19,7 +19,7 @@ try {
 <html>
 <head>
     <title>Room Management</title>
-    <style>
+    <style> 
         .hidden { display: none; }
     </style>
 </head>
@@ -31,26 +31,23 @@ try {
         <p class="success"><?php echo $success_message; ?></p>
     <?php } ?>
 
-	<br><br>
+    <br><br>
     <div class="query-buttons-container">
-		<br><br>
+        <br><br>
         <button onclick="showAllRooms()" id="query-buttons">All Rooms</button>
-		<br><br><br>
-		<button onclick="showSingleRooms()" id="query-buttons">Single Rooms</button>
-		<br>
-		<button onclick="showDoubleRooms()" id="query-buttons">Double Rooms</button>
-		<br><br><br>
-        <button onclick="showPendingRooms()" id="query-buttons">Pending</button>
-		<br>
-		<button onclick="showOccupiedRooms()" id="query-buttons">Occupied</button>
-		<br>
-		<button onclick="showAvailableRooms()" id="query-buttons">Available</button>
-		<br>
-		<button onclick="showMaintenanceRooms()" id="query-buttons">Under Maintenance</button>
-
+        <br><br><br>
+        <button onclick="showSingleRooms()" id="query-buttons">Single Rooms</button>
+        <br>
+        <button onclick="showDoubleRooms()" id="query-buttons">Double Rooms</button>
+        <br><br><br>
+        <button onclick="showOccupiedRooms()" id="query-buttons">Occupied</button>
+        <br>
+        <button onclick="showAvailableRooms()" id="query-buttons">Available</button>
+        <br>
+        <button onclick="showMaintenanceRooms()" id="query-buttons">Under Maintenance</button>
     </div>
 
-    <div class="table">
+    <div class="table-container">
         <table border="1" id="rooms-table">
             <thead>
                 <tr>
@@ -64,7 +61,6 @@ try {
                 <?php if (!empty($rooms)) { ?>
                     <?php foreach ($rooms as $room) { ?>
                         <tr data-status="<?php echo htmlspecialchars($room['room_status']); ?>" data-type="<?php echo htmlspecialchars($room['room_type']); ?>">
-						
                             <td><?php echo htmlspecialchars($room['room_num']); ?></td>
                             <td><?php echo htmlspecialchars($room['room_type']); ?></td>
                             <td><?php echo htmlspecialchars($room['room_status']); ?></td>
@@ -81,46 +77,12 @@ try {
     </div>
 
     <script>
-
         function showAllRooms() {
             const rows = document.querySelectorAll('#rooms-table tbody tr');
             rows.forEach(row => row.classList.remove('hidden'));
         }
 
-        function showPendingRooms() {
-            const rows = document.querySelectorAll('#rooms-table tbody tr');
-            rows.forEach(row => {
-                if (row.getAttribute('data-status') === 'pending') {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
-                }
-            });
-        }
-		
-		function showOccupiedRooms() {
-            const rows = document.querySelectorAll('#rooms-table tbody tr');
-            rows.forEach(row => {
-                if (row.getAttribute('data-status') === 'occupied') {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
-                }
-            });
-        }
-		
-		function showAvailableRooms() {
-            const rows = document.querySelectorAll('#rooms-table tbody tr');
-            rows.forEach(row => {
-                if (row.getAttribute('data-status') === 'available') {
-                    row.classList.remove('hidden');
-                } else {
-                    row.classList.add('hidden');
-                }
-            });
-        }
-		
-		function showMaintenanceRooms() {
+        function showMaintenanceRooms() {
             const rows = document.querySelectorAll('#rooms-table tbody tr');
             rows.forEach(row => {
                 if (row.getAttribute('data-status') === 'maintenance') {
@@ -130,8 +92,31 @@ try {
                 }
             });
         }
-		
-		function showSingleRooms() {
+        
+        function showOccupiedRooms() {
+            const rows = document.querySelectorAll('#rooms-table tbody tr');
+            rows.forEach(row => {
+                if (row.getAttribute('data-status') === 'occupied') {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+        
+        function showAvailableRooms() {
+            const rows = document.querySelectorAll('#rooms-table tbody tr');
+            rows.forEach(row => {
+                if (row.getAttribute('data-status') === 'available') {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+
+        
+        function showSingleRooms() {
             const rows = document.querySelectorAll('#rooms-table tbody tr');
             rows.forEach(row => {
                 if (row.getAttribute('data-type') === 'Single') {
@@ -141,8 +126,8 @@ try {
                 }
             });
         }
-		
-		function showDoubleRooms() {
+        
+        function showDoubleRooms() {
             const rows = document.querySelectorAll('#rooms-table tbody tr');
             rows.forEach(row => {
                 if (row.getAttribute('data-type') === 'Double') {

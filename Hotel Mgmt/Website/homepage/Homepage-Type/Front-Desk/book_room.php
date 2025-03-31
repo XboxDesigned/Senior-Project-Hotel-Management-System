@@ -179,8 +179,7 @@ if (isset($_POST['submit_booking'])) {
 <head>
 	<title>Book Room</title>
 
-    <!-- Add Flatpickr JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+
 </head>
 
 <body>
