@@ -1,12 +1,11 @@
 <?php
-//NOT COMPLETE
 require_once('../../Website/inc/db_connect.php');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if the user is logged in
+// Check login
 if (!isset($_SESSION['user']['user_id']) || !isset($_SESSION['user']['role'])) {
     header("Location: ../../Website/login.php");
     exit();
@@ -15,30 +14,30 @@ if (!isset($_SESSION['user']['user_id']) || !isset($_SESSION['user']['role'])) {
 $user_id = $_SESSION['user']['user_id'];
 $role = $_SESSION['user']['role'];
 
-// If a task update is requested via GET, update that task's status to 'completed'
-if (isset($_GET['update_id'])) {
-    $task_id = filter_input(INPUT_GET, 'update_id', FILTER_VALIDATE_INT);
+// Handle task status toggle via POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id']) && isset($_POST['new_status'])) {
+    $task_id = filter_input(INPUT_POST, 'update_id', FILTER_VALIDATE_INT);
+    $new_status = $_POST['new_status'] === 'completed' ? 'completed' : 'in progress';
+
     if ($task_id) {
         if ($role === 'maintenance') {
-            $queryUpdate = "UPDATE maintenance_tasks SET status = 'completed' WHERE task_id = :task_id AND assigned_to = :user_id";
+            $queryUpdate = "UPDATE maintenance_tasks SET status = :new_status WHERE task_id = :task_id AND assigned_to = :user_id";
         } elseif ($role === 'housekeeper') {
-            $queryUpdate = "UPDATE housekeeping_tasks SET status = 'completed' WHERE task_id = :task_id AND assigned_to = :user_id";
+            $queryUpdate = "UPDATE housekeeping_tasks SET status = :new_status WHERE task_id = :task_id AND assigned_to = :user_id";
         } else {
             die("Unauthorized access.");
         }
+
         $stmt = $db->prepare($queryUpdate);
+        $stmt->bindValue(':new_status', $new_status, PDO::PARAM_STR);
         $stmt->bindValue(':task_id', $task_id, PDO::PARAM_INT);
         $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
         $stmt->closeCursor();
-        
-       
-
-        //exit();
     }
 }
 
-// Fetch tasks assigned to the user from the appropriate table
+// Fetch tasks
 if ($role === 'maintenance') {
     $queryTasks = "SELECT task_id, room_num, task_description, status FROM maintenance_tasks WHERE assigned_to = :user_id";
 } elseif ($role === 'housekeeper') {
@@ -53,42 +52,40 @@ $stmt->execute();
 $tasks = $stmt->fetchAll();
 $stmt->closeCursor();
 ?>
-<!DOCTYPE HTML>
-<html>
-<head>
-    <title>Tasks</title>
-    <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
-    <style>
-        /* Push the table to the right so it's not covered by the menu */
+<link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
+<style>
+    table {
+        margin-left: 220px;
+        width: 80%;
+        max-width: 1000px;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px;
+        border: 1px solid #ccc;
+        text-align: left;
+    }
+    @media (max-width: 900px) {
         table {
-            margin-left: 220px;
-            width: 80%;
-            max-width: 1000px;
-            border-collapse: collapse;
+            width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+            overflow-x: auto;
+            display: block;
         }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-        @media (max-width: 900px) {
-            table {
-                width: 90%;
-                margin-left: auto;
-                margin-right: auto;
-                overflow-x: auto;
-                display: block;
-            }
-        }
-    </style>
-</head>
-<main>
-    
-<body>
-    <div id="data">
-         <h3>Select an option:</h3>
+    }
+</style>
+
+<div id="data">
+    <h3 style="margin-left: 220px;">View Your Tasks:</h3>
+</div>
+<br>
+
+<?php if (empty($tasks)): ?>
+    <div style="margin-left: 220px; color: black;">
+        <h3>No tasks assigned to you at the moment.</h3>
     </div>
-    <br>
+<?php else: ?>
     <table>
         <tr>
             <th>Task ID</th>
@@ -97,24 +94,22 @@ $stmt->closeCursor();
             <th>Status</th>
             <th>Action</th>
         </tr>
-        <?php foreach ($tasks as $task) : ?>
+        <?php foreach ($tasks as $task): ?>
         <tr>
             <td><?php echo htmlspecialchars($task['task_id']); ?></td>
             <td><?php echo htmlspecialchars($task['room_num']); ?></td>
             <td><?php echo htmlspecialchars($task['task_description']); ?></td>
             <td><?php echo htmlspecialchars($task['status']); ?></td>
             <td>
-                <?php if ($task['status'] !== 'completed'): ?>
-                    <button>
-                        <a href="?view_tasks=1&update_id=<?php echo $task['task_id']; ?>">Complete Task</a>
+                <form method="post" style="display:inline;">
+                    <input type="hidden" name="update_id" value="<?php echo $task['task_id']; ?>">
+                    <input type="hidden" name="new_status" value="<?php echo $task['status'] === 'completed' ? 'in progress' : 'completed'; ?>">
+                    <button type="submit">
+                        <?php echo $task['status'] === 'completed' ? 'Mark In Progress' : 'Mark Completed'; ?>
                     </button>
-                <?php else: ?>
-                    Completed
-                <?php endif; ?>
+                </form>
             </td>
         </tr>
         <?php endforeach; ?>
     </table>
-</body>
-</main>
-</html>
+<?php endif; ?>
