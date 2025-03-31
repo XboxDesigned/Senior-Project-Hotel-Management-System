@@ -274,13 +274,14 @@ INSERT INTO users (username, password, role) VALUES
 ('Lyubomir Dimitrov', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
 ('Skyler Dipofi', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
 ('Michael Anderson', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
-('Sarah Williams', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'receptionist'),
+('Sarah Williams', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'front_desk'),
 ('David McGubin', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'housekeeper'),
-('Laura Taylor', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'receptionist'),
+('Laura Taylor', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'front_desk'),
 ('James Goober', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'housekeeper'),
 ('Admin', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
 ('Maintenance', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'maintenance'),
-('Front_Desk', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'front_desk');
+('Front_Desk', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'front_desk'),
+('Housekeeping', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'housekeeper');
 
 
 
