@@ -8,7 +8,8 @@ $success_message = '';
 $guests = $db->query("SELECT g.guest_id, g.first_name, g.last_name, r.room_num 
                       FROM guests g 
                       JOIN reservations r ON g.guest_id = r.guest_id
-                      WHERE r.status != 'checked-out'")
+                      WHERE r.status != 'checked-out'
+					  AND r.status != 'cancelled'")
               ->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_POST['check_out']) && isset($_POST['guest_id']) && isset($_POST['room_num'])) {
@@ -45,7 +46,8 @@ if (isset($_POST['check_out']) && isset($_POST['guest_id']) && isset($_POST['roo
             $guests = $db->query("SELECT g.guest_id, g.first_name, g.last_name, r.room_num 
                                  FROM guests g 
                                  JOIN reservations r ON g.guest_id = r.guest_id
-                                 WHERE r.status != 'checked-out'")
+                                 WHERE r.status != 'checked-out'
+								 AND r.status != 'cancelled'")
                          ->fetchAll(PDO::FETCH_ASSOC);
         } else {
             $error_message = 'Selected guest not found.';
@@ -117,28 +119,23 @@ if (isset($_POST['check_out']) && isset($_POST['guest_id']) && isset($_POST['roo
         </table>
     </div>
 
-    <script>
-        function confirmCheckOut(form) {
-
-            const row = form.closest('tr');
-
-            const firstName = row.cells[1].textContent.trim();
-            const lastName = row.cells[2].textContent.trim();
-            const roomNum = row.cells[3].textContent.trim();
-
-            const guestName = `${firstName} ${lastName}`;
-            
-            return confirm(`Are you sure you want to check out ${guestName} from Room ${roomNum}?`);
-        }
-
-        function showCurrentDate() {
-            
-        }
+   <script>
+    function confirmCheckOut(form) {
+        const row = form.closest('tr');
+        const guestName = row.cells[1].textContent.trim();
+        const roomNum = row.cells[2].textContent.trim();
         
-        function showAllDate() {
-            const rows = document.querySelectorAll('#guests-table tbody tr');
-            rows.forEach(row => row.classList.remove('hidden'));
-        }
-    </script>
+        return confirm(`Are you sure you want to check out ${guestName} from Room ${roomNum}?`);
+    }
+
+    function showCurrentDate() {
+        // Your implementation for showing current date
+    }
+    
+    function showAllDate() {
+        const rows = document.querySelectorAll('#guests-table tbody tr');
+        rows.forEach(row => row.classList.remove('hidden'));
+    }
+</script>
 </body>
 </html>

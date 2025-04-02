@@ -17,7 +17,7 @@ else if (isset($_POST['guests'])) {
 }
 
 else if (isset($_POST['maintenance'])) {
-  include('Homepage-Type/Front-Desk/page_template.php');
+  include('Homepage-Type/Front-Desk/maintenance.php');
 }
 
 else if (isset($_POST['housekeeping'])) {
