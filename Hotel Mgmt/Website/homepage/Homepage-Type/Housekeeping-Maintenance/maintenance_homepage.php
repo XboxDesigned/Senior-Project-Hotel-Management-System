@@ -3,17 +3,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Handle page switching
+// Handle page switching and store selected view in session
 if (isset($_POST['home'])) {
-    include('../../Website/inc/maint_housekeep_dashboard.php');
-}
-
-elseif (isset($_POST['view_tasks'])) {
-	include('view_tasks.php'); 
-}
-
-else {
-    include('../../Website/inc/maint_housekeep_dashboard.php');
+    $_SESSION['maintenance_view'] = 'home';
+} elseif (isset($_POST['view_tasks'])) {
+    $_SESSION['maintenance_view'] = 'view_tasks';
 }
 ?>
 <!DOCTYPE html>
@@ -32,5 +26,14 @@ else {
             </form>
         </div>
     </div>
+
+    <?php
+    // Include content based on session view
+    if (!isset($_SESSION['maintenance_view']) || $_SESSION['maintenance_view'] === 'home') {
+        include('../../Website/inc/maint_housekeep_dashboard.php');
+    } elseif ($_SESSION['maintenance_view'] === 'view_tasks') {
+        include('view_tasks.php');
+    }
+    ?>
 </body>
 </html>
