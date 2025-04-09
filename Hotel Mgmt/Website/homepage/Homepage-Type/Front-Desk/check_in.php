@@ -154,10 +154,7 @@ if (isset($_POST['check_in']) && isset($_POST['guest_id']) && isset($_POST['canc
     <?php } ?>
     
     <div class="query-buttons-container">
-    <br><br>
-    <button onclick="showCurrentDate()" class="query-buttons">Current Date</button>
-    <br><br>
-    <button onclick="showAllDate()" class="query-buttons">All Dates</button>
+
 </div>
 
     <div class="table">

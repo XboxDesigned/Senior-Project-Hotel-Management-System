@@ -82,6 +82,11 @@ else
 
 	<div class="side-buttons-bottom">
 	
+		
+	<form method="post">
+        <button type="submit" name="book_room" id="side-buttons">Book Room</button>
+    </form>
+	
 	<form method="post">
         <button type="submit" name="check_in" id="side-buttons">Check In</button>
     </form>
@@ -90,21 +95,17 @@ else
         <button type="submit" name="check_out" id="side-buttons">Check Out</button>
     </form>
 
-	<form method="post">
-        <button type="submit" name="modify" id="side-buttons">Modify Reservation</button>
-    </form>
 
 	<form method="post">
         <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>
     </form>
 	
-	<form method="post">
-        <button type="submit" name="housekeeping" id="side-buttons">Housekeeping</button>
-    </form>
+
 	
     <form method="post">
         <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
     </form>
+
 	</div>
 	
 	

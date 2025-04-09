@@ -77,10 +77,7 @@ if (isset($_POST['check_out']) && isset($_POST['guest_id']) && isset($_POST['roo
     <?php } ?>
     
     <div class="query-buttons-container">
-        <br><br>
-        <button onclick="showCurrentDate()" class="query-buttons">Current Date</button>
-        <br><br>
-        <button onclick="showAllDate()" class="query-buttons">All Dates</button>
+
     </div>
     
     <div class="table">
