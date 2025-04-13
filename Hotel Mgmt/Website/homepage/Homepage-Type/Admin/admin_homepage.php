@@ -36,11 +36,7 @@ else if (isset($_POST['guests'])) {
 }
 
 else if (isset($_POST['maintenance'])) {
-  include('Homepage-Type/Front-Desk/page_template.php');
-}
-
-else if (isset($_POST['housekeeping'])) {
-  include('Homepage-Type/Front-Desk/page_template.php');
+  include('Homepage-Type/Front-Desk/maintenance.php');
 }
 
 else if (isset($_POST['modify'])) {
@@ -54,6 +50,11 @@ else if (isset($_POST['night_audit'])) {
 
 else if (isset($_POST['book_room'])) {
   include('Homepage-Type/Front-Desk/book_room.php');
+}
+
+else if (isset($_POST['charge_manager'])) {
+	include('Homepage-Type/Front-Desk/charge_manager.php');
+  echo "<script>window.open('../../Website/inc/charge_manager.php', '_blank');</script>";
 }
 
 else if (isset($_POST['check_in'])) {
@@ -81,17 +82,20 @@ else
 
 	<div class="side-buttons-container">
 	<div class="side-buttons-top">
+	
+			
+    </form>
+	<form method="post">
+        <button type="submit" name="home" id="side-buttons">Home</button>
+    </form>
+	
     <form method="post">
         <button type="submit" name="register" id="side-buttons">Add New User</button>
     </form>
     
     <form method="post">
         <button type="submit" name="select" id="side-buttons">View Users</button>
-		
-    </form>
-	<form method="post">
-        <button type="submit" name="home" id="side-buttons">Home</button>
-    </form>
+
 	
 	<form method="post">
         <button type="submit" name="rooms" id="side-buttons">Rooms</button>
@@ -104,10 +108,6 @@ else
 	<form method="post">
         <button type="submit" name="guests" id="side-buttons">Guests</button>
     </form>
-	</div>
-	
-
-	<div class="side-buttons-bottom">
 	
 	<form method="post">
         <button type="submit" name="check_in" id="side-buttons">Check In</button>
@@ -122,17 +122,21 @@ else
     </form>
 
 	<form method="post">
-        <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>
+        <button type="submit" name="maintenance" id="side-buttons">Action Request</button>
     </form>
 	
 	<form method="post">
-        <button type="submit" name="housekeeping" id="side-buttons">Housekeeping</button>
+        <button type="submit" name="charge_manager" id="side-buttons">Charge Manager</button>
     </form>
+	
 	
     <form method="post">
         <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
     </form>
 	</div>
+	
+	</div>
+	
 	
 	
 </body>
