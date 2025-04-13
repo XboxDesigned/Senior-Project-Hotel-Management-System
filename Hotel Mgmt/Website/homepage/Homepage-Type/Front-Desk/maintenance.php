@@ -3,22 +3,25 @@ require_once('../../Website/inc/db_connect.php');
 
 $error_message = '';
 $success_message = '';
+$rooms = [];
+$all_staff = [];
 
 try {
     // Fetch all rooms
     $query = "SELECT room_num, room_type, room_status, rate_plan FROM rooms";
     $stmt = $db->query($query);
     $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Handle maintenance request submission
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['maintenance']) && isset($_POST['submit_val'])) {
-        $room_num = $_POST['room_num'];
-        $description = $_POST['description'];
-        $assigned_to = $_POST['assigned_to'];
+
+    // Handle maintenance request submission only if form was submitted
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['maintenance'])) {
+        // Initialize variables
+        $room_num = $_POST['room_num'] ?? '';
+        $description = $_POST['description'] ?? '';
+        $assigned_to = $_POST['assigned_to'] ?? '';
         
         // Validate inputs
         if (empty($room_num) || empty($description) || empty($assigned_to)) {
-            $error_message = 'Room number, description, and assigned staff are required.';
+            $error_message = '';
         } else {
             // Begin transaction
             $db->beginTransaction();
@@ -38,7 +41,6 @@ try {
                 $stmt->execute();
                 
                 $db->commit();
-                $success_message = 'Maintenance request submitted successfully!';
                 
                 // Refresh room data
                 $query = "SELECT room_num, room_type, room_status, rate_plan FROM rooms";
@@ -46,15 +48,14 @@ try {
                 $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
             } catch (PDOException $e) {
                 $db->rollBack();
-                $error_message = 'Database error: ' . $e->getMessage();
             }
         }
     }
     
-    // Fetch only maintenance staff for assignment dropdown
-    $staff_query = "SELECT u_id, username FROM users WHERE role = 'maintenance'";
+    // Fetch maintenance and housekeeping staff with roles for assignment dropdown
+    $staff_query = "SELECT u_id, username, role FROM users WHERE role = 'maintenance' OR role = 'housekeeper'";
     $staff_stmt = $db->query($staff_query);
-    $maintenance_staff = $staff_stmt->fetchAll(PDO::FETCH_ASSOC);
+    $all_staff = $staff_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     $error_message = 'Database error: ' . $e->getMessage();
@@ -86,27 +87,60 @@ try {
             width: 50%;
             max-width: 600px;
         }
-       
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .filter-buttons {
+            margin-bottom: 15px;
+        }
+        .filter-buttons button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .staff-option {
+            display: flex;
+            justify-content: space-between;
+        }
+        .staff-role {
+            color: #666;
+            font-style: italic;
+        }
+		
     </style>
 </head>
 <body>
     <h1>Room Management</h1>
     
     <?php if (!empty($error_message)) { ?>
-        <div class="error-message" style="color: red; padding: 10px; background-color: #ffebee; margin-bottom: 15px; border-radius: 4px;">
             <?php echo htmlspecialchars($error_message); ?>
-        </div>
     <?php } ?>
     
     <?php if (!empty($success_message)) { ?>
-        <div class="success">
             <?php echo htmlspecialchars($success_message); ?>
-        </div>
     <?php } ?>
-
+	
+	
+	<br><br>
     <div class="query-buttons-container">
-
+        <br><br>
+        <button onclick="showAllRooms()" id="query-buttons">All Rooms</button>
+        <br><br><br>
+        <button onclick="showSingleRooms()" id="query-buttons">Single Rooms</button>
+        <br>
+        <button onclick="showDoubleRooms()" id="query-buttons">Double Rooms</button>
+        <br><br><br>
+        <button onclick="showOccupiedRooms()" id="query-buttons">Occupied</button>
+        <br>
+        <button onclick="showAvailableRooms()" id="query-buttons">Available</button>
+        <br>
+        <button onclick="showMaintenanceRooms()" id="query-buttons">Under Maintenance</button>
     </div>
+	
 
     <div class="table-container">
          <table border="1" id="rooms-table">
@@ -133,13 +167,9 @@ try {
                             </td>
                             <td>$<?php echo number_format($room['rate_plan'], 2); ?></td>
                             <td>
-                                <?php if ($room['room_status'] !== 'maintenance') { ?>
-                                    <button class="maintenance-btn" onclick="openMaintenanceModal('<?php echo $room['room_num']; ?>')">
-                                        Request Maintenance
-                                    </button>
-                                <?php } else { ?>
-                                    <span style="color: #e74c3c;">Maintenance in progress</span>
-                                <?php } ?>
+                                <button class="maintenance-btn" onclick="openMaintenanceModal('<?php echo $room['room_num']; ?>')">
+                                    Request Action
+                                </button>
                             </td>
                         </tr>
                     <?php } ?>
@@ -152,27 +182,35 @@ try {
         </table>
     </div>
 
-    <!-- Maintenance Request Modal -->
     <div id="maintenanceModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeMaintenanceModal()">&times;</span>
-            <h2>Submit Maintenance Request</h2>
+            <h2>Submit Request</h2>
             <form method="post" action="">
                 <input type="hidden" id="modal-room-num" name="room_num">
-                <input type="hidden" name="maintenance_val" value="1">
+                <input type="hidden" name="maintenance" value="1">
                 
                 <div class="form-group">
-                    <label for="description">Description:</label>
-                    <textarea id="description" name="description" rows="4" required></textarea>
+                    <label id="description-label" for="description">Description for Room #<span id="display-room-num"></span>:</label><br>
+                    <textarea id="description" name="description" rows="4" cols="50" required></textarea>
+                </div>
+                
+                <div class="filter-buttons">
+                    <button type="button" onclick="filterStaff('all')">All Staff</button>
+                    <button type="button" onclick="filterStaff('maintenance')">Maintenance Only</button>
+                    <button type="button" onclick="filterStaff('housekeeper')">Housekeeping Only</button>
                 </div>
                 
                 <div class="form-group">
-                    <label for="assigned_to">Assign To:</label>
+                    <label for="assigned_to">Assign To:</label><br>
                     <select id="assigned_to" name="assigned_to" required>
-                        <option value="">-- Select Maintenance Staff --</option>
-                        <?php foreach ($maintenance_staff as $staff) { ?>
-                            <option value="<?php echo $staff['u_id']; ?>">
-                                <?php echo htmlspecialchars($staff['username']); ?>
+                        <option value="">-- Select Staff Member --</option>
+                        <?php foreach ($all_staff as $staff) { ?>
+                            <option value="<?php echo $staff['u_id']; ?>" data-role="<?php echo htmlspecialchars($staff['role']); ?>">
+                                <span class="staff-option">
+                                    <span class="staff-name"><?php echo htmlspecialchars($staff['username']); ?></span>
+                                    <span class="staff-role">(<?php echo htmlspecialchars($staff['role']); ?>)</span>
+                                </span>
                             </option>
                         <?php } ?>
                     </select>
@@ -180,8 +218,7 @@ try {
                 
                 <div class="form-actions">
                     <button type="button" onclick="closeMaintenanceModal()" class="btn btn-cancel">Cancel</button>
-					<input type="hidden" name="submit_val"> 
-                    <button type="submit" name="maintenance" class="btn btn-submit">Submit Request</button>
+                    <button type="submit" class="btn btn-submit">Submit Request</button>
                 </div>
             </form>
         </div>
@@ -260,10 +297,34 @@ try {
             });
         }
 
+        // Staff filtering for modal
+        function filterStaff(role) {
+            const options = document.querySelectorAll('#assigned_to option');
+            options.forEach(option => {
+                if (option.value === "") {
+                    option.style.display = 'block'; // Always show the placeholder
+                    return;
+                }
+                
+                const optionRole = option.getAttribute('data-role');
+                if (role === 'all' || optionRole === role) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            
+            // Reset selection when filtering
+            document.getElementById('assigned_to').value = "";
+        }
+
         // Maintenance modal functions
         function openMaintenanceModal(roomNum) {
             document.getElementById('modal-room-num').value = roomNum;
+            document.getElementById('display-room-num').textContent = roomNum;
             document.getElementById('maintenanceModal').style.display = 'block';
+            // Show all staff by default when modal opens
+            filterStaff('all');
         }
 
         function closeMaintenanceModal() {
@@ -272,7 +333,6 @@ try {
             document.getElementById('assigned_to').value = '';
         }
 
-        // Close modal when clicking outside of it
         window.onclick = function(event) {
             const modal = document.getElementById('maintenanceModal');
             if (event.target === modal) {

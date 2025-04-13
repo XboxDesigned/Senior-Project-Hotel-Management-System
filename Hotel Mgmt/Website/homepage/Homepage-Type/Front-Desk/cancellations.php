@@ -40,7 +40,7 @@ try {
     <?php } ?>
 
 <div class="table">
-    <table border="1">
+        <table border="1" id="rooms-table">
         <thead>
             <tr>
                 <th>Guest ID</th>

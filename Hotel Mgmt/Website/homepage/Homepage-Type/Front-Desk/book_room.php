@@ -39,6 +39,14 @@ $rooms = $statement->fetchAll(PDO::FETCH_ASSOC);
 if (isset($_SESSION['success_message'])) {
     $success_message = $_SESSION['success_message'];
     unset($_SESSION['success_message']);
+    
+    // Clear any stored form data after success
+    unset($_SESSION['form_data']);
+}
+
+// Store form data in session if there was an error
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_room'])) {
+    $_SESSION['form_data'] = $_POST;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['book_room']) && isset($_POST['submit_val']))) {
@@ -170,12 +178,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['book_room']) && isse
 <head>
     <title>Book Room</title>
     <style>
+        
     </style>
 </head>
 
 <body>
     <form class="book-room-form" method="post">
-		<br><br><br>
+        <h2>Book a Room</h2>
         <?php if (!empty($error_message)): ?>
             <p class="error"><?php echo htmlspecialchars($error_message); ?></p>
         <?php endif; ?>
@@ -184,50 +193,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['book_room']) && isse
             <p class="success"><?php echo htmlspecialchars($success_message); ?></p>
         <?php endif; ?>
         
-        <h3>Guest Information:</h3><br>
+        <h3>Guest Information:</h3>
+		        
+		<br>        
+		<br>
+		
+		
         <label>First Name</label>
-        <input type="text" name="firstName" placeholder="First Name" value="<?php echo isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : ''; ?>">
+        <input type="text" name="firstName" placeholder="First Name" value="<?php echo (isset($_SESSION['form_data']['firstName'])) ? htmlspecialchars($_SESSION['form_data']['firstName']) : ''; ?>">
        
         <label>Last Name</label>
-        <input type="text" name="lastName" placeholder="Last Name" value="<?php echo isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : ''; ?>">
-        <br>
+        <input type="text" name="lastName" placeholder="Last Name" value="<?php echo (isset($_SESSION['form_data']['lastName'])) ? htmlspecialchars($_SESSION['form_data']['lastName']) : ''; ?>">
+		
+		<br>
+        
         <label>Email Address</label>
-        <input type="username" name="emailAddress" placeholder="Email Address" value="<?php echo isset($_POST['emailAddress']) ? htmlspecialchars($_POST['emailAddress']) : ''; ?>">
+        <input type="email" name="emailAddress" placeholder="Email Address" value="<?php echo (isset($_SESSION['form_data']['emailAddress'])) ? htmlspecialchars($_SESSION['form_data']['emailAddress']) : ''; ?>">
         
         <label>Phone Number</label>
-        <input type="tel" name="contactNum" placeholder="Phone Number" value="<?php echo isset($_POST['contactNum']) ? htmlspecialchars($_POST['contactNum']) : ''; ?>">
+        <input type="tel" name="contactNum" placeholder="Phone Number" value="<?php echo (isset($_SESSION['form_data']['contactNum'])) ? htmlspecialchars($_SESSION['form_data']['contactNum']) : ''; ?>">
         
-        <br>
-        
-        <label>Room Number:</label>
-        <select name="room_num">
-            <option value="">Select a Room</option>
-            <?php foreach ($rooms as $room): ?>
-                <option value="<?php echo htmlspecialchars($room['room_num']); ?>"
-                    <?php echo (isset($_POST['room_num']) && $_POST['room_num'] == $room['room_num']) ? 'selected' : ''; ?>>
-                    Room <?php echo htmlspecialchars($room['room_num']); ?> - 
-                    <?php echo htmlspecialchars($room['room_type']); ?> - $
-                    <?php echo htmlspecialchars($room['rate_plan']); ?>/night
-                </option>
-            <?php endforeach; ?>
-        </select><br>
+
+		<br>
+		
         
         <label>Number of Guests:</label>
         <select name="num_guests">
-            <option value="1" <?php echo (isset($_POST['num_guests']) && $_POST['num_guests'] == '1') ? 'selected' : ''; ?>>1 Guest</option>
-            <option value="2" <?php echo (isset($_POST['num_guests']) && $_POST['num_guests'] == '2') ? 'selected' : ''; ?>>2 Guests</option>
-        </select><br>
+            <option value="1" <?php echo (isset($_SESSION['form_data']['num_guests']) && $_SESSION['form_data']['num_guests'] == '1') ? 'selected' : ''; ?>>1 Guest</option>
+            <option value="2" <?php echo (isset($_SESSION['form_data']['num_guests']) && $_SESSION['form_data']['num_guests'] == '2') ? 'selected' : ''; ?>>2 Guests</option>
+        </select>
+		
+		        
+		<br>
+		
         
         <label>Check In Date:</label>
         <input type="date" name="checkin_date" id="checkin_date" placeholder="Select Check-in Date" 
-               value="<?php echo isset($_POST['checkin_date']) ? htmlspecialchars($_POST['checkin_date']) : ''; ?>"><br>
+               value="<?php echo (isset($_SESSION['form_data']['checkin_date'])) ? htmlspecialchars($_SESSION['form_data']['checkin_date']) : ''; ?>">
         
         <label>Check Out Date:</label>
         <input type="date" name="checkout_date" id="checkout_date" placeholder="Select Check-out Date"
-               value="<?php echo isset($_POST['checkout_date']) ? htmlspecialchars($_POST['checkout_date']) : ''; ?>"><br>
+               value="<?php echo (isset($_SESSION['form_data']['checkout_date'])) ? htmlspecialchars($_SESSION['form_data']['checkout_date']) : ''; ?>">
         
         <button type="submit" name="book_room">Book Room</button>
-		<input type="hidden" name="submit_val"> 
+        <input type="hidden" name="submit_val"> 
     </form>
+
+    <script>
+        // Clear form if success message is shown
+        <?php if (!empty($success_message)): ?>
+            document.querySelector('.book-room-form').reset();
+        <?php endif; ?>
+        
+        // Set minimum date for check-in to today
+        document.getElementById('checkin_date').min = new Date().toISOString().split('T')[0];
+        
+        // Update checkout date min when checkin date changes
+        document.getElementById('checkin_date').addEventListener('change', function() {
+            document.getElementById('checkout_date').min = this.value;
+        });
+    </script>
 </body>
 </html>

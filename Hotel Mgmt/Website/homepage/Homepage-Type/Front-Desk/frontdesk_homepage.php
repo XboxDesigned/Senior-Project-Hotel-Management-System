@@ -37,6 +37,11 @@ else if (isset($_POST['book_room'])) {
   include('Homepage-Type/Front-Desk/book_room.php');
 }
 
+else if (isset($_POST['charge_manager'])) {
+	include('Homepage-Type/Front-Desk/charge_manager.php');
+  echo "<script>window.open('../../Website/inc/charge_manager.php', '_blank');</script>";
+}
+
 else if (isset($_POST['check_in'])) {
   include('Homepage-Type/Front-Desk/check_in.php');
 }
@@ -97,14 +102,18 @@ else
 
 
 	<form method="post">
-        <button type="submit" name="maintenance" id="side-buttons">Maintenance</button>
+        <button type="submit" name="maintenance" id="side-buttons">Action Request</button>
     </form>
-	
 
+
+	<form method="post">
+        <button type="submit" name="charge_manager" id="side-buttons">Charge Manager</button>
+    </form>
 	
     <form method="post">
         <button type="submit" name="night_audit" id="side-buttons">Night Audit</button>
     </form>
+	
 
 	</div>
 	
