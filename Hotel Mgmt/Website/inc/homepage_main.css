@@ -213,7 +213,6 @@ overflow: hidden;
     margin: 20px auto;
     background-color: transparent;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 	max-height: 550px;
 
 }
@@ -273,7 +272,7 @@ table td {
     padding: 10px;
     background-color: transparent;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
     margin-top: 10%;
 	overflow: hidden;
 }
