@@ -37,7 +37,7 @@ CREATE TABLE reservations (
     checkout_date DATE NOT NULL,
     checkout_datetime DATETIME DEFAULT NULL,
     balance DECIMAL(10,2) DEFAULT 0.00,
-    room_num INT NOT NULL,
+    room_num INT,
     nights INT,
     status VARCHAR(50) NOT NULL DEFAULT 'active',
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
