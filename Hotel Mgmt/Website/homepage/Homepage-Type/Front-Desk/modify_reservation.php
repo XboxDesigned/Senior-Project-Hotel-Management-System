@@ -164,26 +164,8 @@ if (isset($_POST['modify']) && isset($_POST['submit_val'])) {
 <head>
     <title>Modify Reservations</title>
     <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-        }
-		
-		.search-container {
+       
+	.search-container {
         display: flex;
         justify-content: center;
         margin: 20px 0;
@@ -288,7 +270,7 @@ if (isset($_POST['modify']) && isset($_POST['submit_val'])) {
                 <option value="cancelled">Cancelled</option>
             </select><br><br>
             
-            <input type="submit" name="modify" value="Save Changes">
+            <button type="submit" name="modify">Save Changes</button>
 			<input type="hidden" name="submit_val"> 
         </form>
     </div>
