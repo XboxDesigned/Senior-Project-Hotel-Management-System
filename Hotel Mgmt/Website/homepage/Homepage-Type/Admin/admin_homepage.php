@@ -22,8 +22,12 @@ else if (isset($_POST['home'])) {
   include('../../Website/inc/dashboard.php');
 }
 
-else if (isset($_POST['rooms'])) {
-  include('Homepage-Type/Front-Desk/rooms.php');
+else if (isset($_POST['modify_room'])) {
+  include('Homepage-Type/Admin/modify_room.php');
+}
+
+else if (isset($_POST['create_room'])) {
+  include('Homepage-Type/Admin/create_room.php');
 }
 
 else if (isset($_POST['cancellations'])) {
@@ -96,9 +100,11 @@ else
     <form method="post">
         <button type="submit" name="select" id="side-buttons">Update User</button>
 
-	
 	<form method="post">
-        <button type="submit" name="rooms" id="side-buttons">Rooms</button>
+        <button type="submit" name="create_room" id="side-buttons">Create Room</button>
+    </form>
+	<form method="post">
+        <button type="submit" name="modify_room" id="side-buttons">Update Rooms</button>
     </form>
 	
 	<form method="post">
