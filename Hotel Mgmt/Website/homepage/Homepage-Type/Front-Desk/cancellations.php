@@ -39,7 +39,7 @@ try {
         <p class="success"><?php echo $success_message; ?></p>
     <?php } ?>
 
-<div class="table">
+	 <div class="table-container">
         <table border="1" id="rooms-table">
         <thead>
             <tr>
@@ -67,6 +67,7 @@ try {
                     </tr>
                 <?php } ?>
             </tbody>
+		</table>
     </div>
 </div>
 

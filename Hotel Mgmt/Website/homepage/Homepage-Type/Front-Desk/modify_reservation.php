@@ -198,8 +198,8 @@ if (isset($_POST['modify']) && isset($_POST['submit_val'])) {
     <p class="success"><?php echo $success_message; ?></p>
 <?php } ?>
 
-<div class="table">
-    <table id="guests-table" border="1">
+<div class="table-container">
+        <table border="1" id="rooms-table">
         <tr>
             <th>Confirmation #</th>
             <th>Guest Name</th>

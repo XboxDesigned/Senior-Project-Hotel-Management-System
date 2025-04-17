@@ -80,8 +80,8 @@ if (isset($_POST['check_out']) && isset($_POST['guest_id']) && isset($_POST['roo
 
     </div>
     
-    <div class="table">
-        <table id="guests-table" border="1">
+<div class="table-container">
+        <table border="1" id="rooms-table">
             <thead>
                 <tr>
                     <th>Guest ID</th>

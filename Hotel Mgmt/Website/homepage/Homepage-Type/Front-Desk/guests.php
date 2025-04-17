@@ -42,10 +42,12 @@ try {
         <button onclick="showCheckedIn()" id="query-buttons">Checked In</button>
 		<br>
         <button onclick="showCheckedOut()" id="query-buttons">Checked Out</button>
+		<br>
+        <button onclick="showCancelled()" id="query-buttons">Cancelled</button>
     </div>
 
-    <div class="table">
-        <table border="1" id="guests-table">
+     <div class="table-container">
+        <table border="1" id="rooms-table">
             <thead>
                 <tr>
                     <th>Guest ID</th>
@@ -79,12 +81,12 @@ try {
 
     <script>
         function showAllGuests() {
-            const rows = document.querySelectorAll('#guests-table tbody tr');
+            const rows = document.querySelectorAll('#rooms-table tbody tr');
             rows.forEach(row => row.classList.remove('hidden'));
         }
 
         function showCheckedIn() {
-            const rows = document.querySelectorAll('#guests-table tbody tr');
+            const rows = document.querySelectorAll('#rooms-table tbody tr');
             rows.forEach(row => {
                 if (row.getAttribute('data-status') === 'checked-in') {
                     row.classList.remove('hidden');
@@ -95,9 +97,20 @@ try {
         }
 
         function showCheckedOut() {
-            const rows = document.querySelectorAll('#guests-table tbody tr');
+            const rows = document.querySelectorAll('#rooms-table tbody tr');
             rows.forEach(row => {
                 if (row.getAttribute('data-status') === 'checked-out') {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+		
+		function showCancelled() {
+            const rows = document.querySelectorAll('#rooms-table tbody tr');
+            rows.forEach(row => {
+                if (row.getAttribute('data-status') === 'cancelled') {
                     row.classList.remove('hidden');
                 } else {
                     row.classList.add('hidden');
