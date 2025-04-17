@@ -32,7 +32,7 @@ if ($u_id) {
 }
 
 // Process form submission only when "Update User" is clicked
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_user'])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['select']) && isset($_POST['submit_val'])) {
     $u_id = filter_input(INPUT_POST, 'uid', FILTER_VALIDATE_INT);
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $password = filter_input(INPUT_POST, 'password');
@@ -150,7 +150,6 @@ input[name="username"], input[name="password"] {
 
 </style>
 
-<!-- Only show the update form if user data is available -->
 <?php if ($user): ?>
     <div class="form-container">
         <h3>Update User ID: <?php echo htmlspecialchars($u_id); ?></h3>
@@ -178,7 +177,8 @@ input[name="username"], input[name="password"] {
                 </tr>
             </table>
             <br>
-            <input type="submit" name="update_user" value="Update User">
+            <input type="submit" name="select" value="Update User">
+			<input type="hidden" name="submit_val"> 
             
         </form>
         <button type="button" onclick="window.location.href='Homepage.php';">CANCEL</button>

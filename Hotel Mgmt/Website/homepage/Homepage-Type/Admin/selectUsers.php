@@ -74,15 +74,13 @@ $statementUsers->closeCursor();
                 <button onclick="showHousekeeper()" id="query-buttons">Housekeeper</button>
             </div>
 
-            <div class="table">
-                <table border="1" id="users-table">
-                    <br>
+            <div class="table-container">
+				<table border="1" id="rooms-table">
                     <thead>
                         <tr>
                             <th>User ID</th>
                             <th>Username</th>
                             <th>Role</th>
-							<th>Password</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -92,7 +90,6 @@ $statementUsers->closeCursor();
                             <td><?php echo htmlspecialchars($item['u_id']); ?></td>
                             <td><?php echo htmlspecialchars($item['username']); ?></td>
                             <td><?php echo htmlspecialchars($item['role']); ?></td>
-							<td><?php echo htmlspecialchars($item['password']); ?></td>
                             <td><button onclick="openModal(<?php echo $item['u_id']; ?>, '<?php echo htmlspecialchars($item['username']); ?>', '<?php echo htmlspecialchars($item['role']); ?>')">Update User</button></td>
                         </tr>
                         <?php endforeach; ?>
@@ -143,7 +140,7 @@ $statementUsers->closeCursor();
             <script>
                 // Filter functions
                 function showAllUsers() {
-                    const rows = document.querySelectorAll('#users-table tbody tr');
+                    const rows = document.querySelectorAll('#rooms-table tbody tr');
                     rows.forEach(row => row.classList.remove('hidden'));
                 }
                 
@@ -164,7 +161,7 @@ $statementUsers->closeCursor();
                 }
                 
                 function filterUsersByRole(role) {
-                    const rows = document.querySelectorAll('#users-table tbody tr');
+                    const rows = document.querySelectorAll('#rooms-table tbody tr');
                     rows.forEach(row => {
                         if (row.getAttribute('data-role').toLowerCase() === role.toLowerCase()) {
                             row.classList.remove('hidden');
