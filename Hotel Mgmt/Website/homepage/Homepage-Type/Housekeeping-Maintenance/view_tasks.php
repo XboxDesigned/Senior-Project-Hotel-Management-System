@@ -54,31 +54,9 @@ $stmt->closeCursor();
 ?>
 <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
 <style>
-    table {
-        margin-left: 220px;
-        width: 80%;
-        max-width: 1000px;
-        border-collapse: collapse;
-    }
-    th, td {
-        padding: 12px;
-        border: 1px solid #ccc;
-        text-align: left;
-    }
-    @media (max-width: 900px) {
-        table {
-            width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-            overflow-x: auto;
-            display: block;
-        }
-    }
+
 </style>
 
-<div id="data">
-    <h3 style="margin-left: 220px;">View Your Tasks:</h3>
-</div>
 <br>
 
 <?php if (empty($tasks)): ?>
@@ -86,6 +64,11 @@ $stmt->closeCursor();
         <h3>No tasks assigned to you at the moment.</h3>
     </div>
 <?php else: ?>
+
+
+
+<div class="table-container">
+        <table border="1" id="rooms-table">
     <table>
         <tr>
             <th>Task ID</th>
