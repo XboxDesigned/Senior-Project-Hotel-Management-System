@@ -36,11 +36,23 @@ $revenue = $statement->fetch(PDO::FETCH_ASSOC);
 $statement->closeCursor();
 
 // Fetch Pending Housekeeping Tasks
-$query = "SELECT task_id, room_num, task_description, status FROM housekeeping_tasks WHERE status = 'pending'";
-$statement = $db->prepare($query);
-$statement->execute();
-$housekeeping = $statement->fetchAll(PDO::FETCH_ASSOC);
-$statement->closeCursor();
+$hk_query = "SELECT task_id, room_num, task_description, status, 'housekeeping' AS task_type 
+             FROM housekeeping_tasks WHERE status = 'pending'";
+$hk_statement = $db->prepare($hk_query);
+$hk_statement->execute();
+$hk_tasks = $hk_statement->fetchAll(PDO::FETCH_ASSOC);
+$hk_statement->closeCursor();
+
+// Fetch Pending Maintenance Tasks
+$maint_query = "SELECT task_id, room_num, task_description, status, 'maintenance' AS task_type 
+                FROM maintenance_tasks WHERE status = 'pending'";
+$maint_statement = $db->prepare($maint_query);
+$maint_statement->execute();
+$maint_tasks = $maint_statement->fetchAll(PDO::FETCH_ASSOC);
+$maint_statement->closeCursor();
+
+// Merge tasks
+$pending_tasks = array_merge($hk_tasks, $maint_tasks);
 ?>
 
 <!DOCTYPE html>
@@ -92,9 +104,15 @@ $statement->closeCursor();
 
     <h3>Pending Housekeeping / Maintenance Tasks</h3>
     <table>
-        <tr><th>Task ID</th><th>Room ID</th><th>Description</th><th>Status</th></tr>
-        <?php foreach ($housekeeping as $row) { ?>
-            <tr><td><?= htmlspecialchars($row["task_id"]) ?></td><td><?= htmlspecialchars($row["room_num"]) ?></td><td><?= htmlspecialchars($row["task_description"]) ?></td><td><?= htmlspecialchars($row["status"]) ?></td></tr>
+        <tr><th>Task ID</th><th>Room ID</th><th>Description</th><th>Status</th><th>Task Type</th></tr>
+        <?php foreach ($pending_tasks as $row) { ?>
+            <tr>
+                <td><?= htmlspecialchars($row["task_id"]) ?></td>
+                <td><?= htmlspecialchars($row["room_num"]) ?></td>
+                <td><?= htmlspecialchars($row["task_description"]) ?></td>
+                <td><?= htmlspecialchars($row["status"]) ?></td>
+                <td><?= htmlspecialchars($row["task_type"]) ?></td>
+            </tr>
         <?php } ?>
     </table>
 
