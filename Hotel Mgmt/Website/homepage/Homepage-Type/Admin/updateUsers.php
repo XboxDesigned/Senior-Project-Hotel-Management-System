@@ -71,8 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_user'])) {
         $statementUU->closeCursor();
         //vardump($username);
         // Redirect back after success
-        header("Location: homepage.php?returnviewusers=0");
-
+        header("Location: homepage.php");
         exit();
     }
 }
@@ -182,8 +181,7 @@ input[name="username"], input[name="password"] {
             <input type="submit" name="update_user" value="Update User">
             
         </form>
-        <button type="button" onclick="window.location.href='homepage.php?returnviewusers=0';">CANCEL</button>
-
+        <button type="button" onclick="window.location.href='Homepage.php';">CANCEL</button>
     </div>
 <?php else: ?>
     <p style="color:red;">User not found.</p>
