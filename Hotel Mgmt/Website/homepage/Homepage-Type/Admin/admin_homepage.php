@@ -117,6 +117,10 @@ if (isset($_POST['night_audit'])) {
 }
 
 if (isset($_POST['book_room'])) {
+  include('Homepage-Type/Front-Desk/book_room.php');
+}
+
+if (isset($_POST['book_room'])) {
     include('Homepage-Type/Front-Desk/book_room.php');
     $page_loaded = true;
 }
@@ -155,6 +159,7 @@ if (!$page_loaded) {
             <form method="post"><button type="submit" name="modify_room" id="side-buttons">Update Rooms</button></form>
             <form method="post"><button type="submit" name="cancellations" id="side-buttons">Cancellations</button></form>
             <form method="post"><button type="submit" name="guests" id="side-buttons">Guests</button></form>
+			<form method="post"><button type="submit" name="book_room" id="side-buttons">Book Room</button></form>
             <form method="post"><button type="submit" name="check_in" id="side-buttons">Check In</button></form>
             <form method="post"><button type="submit" name="check_out" id="side-buttons">Check Out</button></form>
             <form method="post"><button type="submit" name="modify" id="side-buttons">Modify Reservation</button></form>
