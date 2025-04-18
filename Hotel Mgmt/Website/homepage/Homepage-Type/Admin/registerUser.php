@@ -87,8 +87,8 @@ if (isset($_POST['register'])) {
                     <option value="housekeeper" <?php echo ($u_role == 'housekeeper') ? 'selected' : ''; ?>>Housekeeper</option>
                 </select>
             </label><br>
-
-            <button type="submit" name="register">Submit</button>
+			<br>
+            <button class="register-btn" type="submit" name="register">Submit</button>
         </form>
     </div>
 
