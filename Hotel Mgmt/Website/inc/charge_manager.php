@@ -19,6 +19,7 @@ $search_term = isset($_POST['search']) ? trim($_POST['search']) : '';
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<link rel="stylesheet" type="text/css" href="homepage_main.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Charge Manager</title>
@@ -315,7 +316,7 @@ $search_term = isset($_POST['search']) ? trim($_POST['search']) : '';
                         <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
                         <label>Description: <input type="text" name="description" required></label><br>
                         <label>Amount: <input type="number" step="0.01" name="amount" required></label><br>
-                        <button type="submit" name="add_charge">Add Charge</button>
+                        <button class="charge-btn" type="submit" name="add_charge">Add Charge</button>
                     </form>
                 </div>
 
@@ -326,13 +327,13 @@ $search_term = isset($_POST['search']) ? trim($_POST['search']) : '';
                         <input type="hidden" name="show_guest" value="true">
                         <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
                         <label>Amount: <input type="number" step="0.01" name="payment_amount" required></label><br>
-                        <button type="submit" name="add_payment">Add Payment</button>
+                        <button class="charge-btn" type="submit" name="add_payment">Add Payment</button>
                     </form>
                 </div>
 
                 <form method="POST" action="">
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
-                    <button type="submit" name="close_modal">Close</button>
+                    <button class="charge-btn" type="submit" name="close_modal">Close</button>
                 </form>
             </div>
         </div>
