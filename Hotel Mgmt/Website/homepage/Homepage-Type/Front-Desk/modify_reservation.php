@@ -218,7 +218,7 @@ if (isset($_POST['modify']) && isset($_POST['submit_val'])) {
                 <td><?php echo htmlspecialchars($reservation['room_num']); ?></td>
                 <td><?php echo htmlspecialchars($reservation['status']); ?></td>
                 <td>
-                    <button onclick="openModal('<?php echo $reservation['reservation_id']; ?>', 
+                    <button class="modify-btn" onclick="openModal('<?php echo $reservation['reservation_id']; ?>', 
                                               '<?php echo $reservation['confirmation_num']; ?>', 
                                               '<?php echo $reservation['first_name'] . ' ' . $reservation['last_name']; ?>', 
                                               '<?php echo $reservation['checkin_date']; ?>', 
@@ -270,7 +270,7 @@ if (isset($_POST['modify']) && isset($_POST['submit_val'])) {
                 <option value="cancelled">Cancelled</option>
             </select><br><br>
             
-            <button type="submit" name="modify">Save Changes</button>
+            <button class="modify-btn" type="submit" name="modify">Save Changes</button>
 			<input type="hidden" name="submit_val"> 
         </form>
     </div>
