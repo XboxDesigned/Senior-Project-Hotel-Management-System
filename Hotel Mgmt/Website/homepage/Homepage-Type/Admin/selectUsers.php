@@ -90,7 +90,7 @@ $statementUsers->closeCursor();
                             <td><?php echo htmlspecialchars($item['u_id']); ?></td>
                             <td><?php echo htmlspecialchars($item['username']); ?></td>
                             <td><?php echo htmlspecialchars($item['role']); ?></td>
-                            <td><button onclick="openModal(<?php echo $item['u_id']; ?>, '<?php echo htmlspecialchars($item['username']); ?>', '<?php echo htmlspecialchars($item['role']); ?>')">Update User</button></td>
+                            <td><button class="update-btn" onclick="openModal(<?php echo $item['u_id']; ?>, '<?php echo htmlspecialchars($item['username']); ?>', '<?php echo htmlspecialchars($item['role']); ?>')">Update User</button></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -127,9 +127,9 @@ $statementUsers->closeCursor();
     </div>
     
     <div class="form-actions">
-        <button type="submit" name="select">Update User</button>
+        <button class="update-btn" type="submit" name="select">Update User</button>
         <input type="hidden" name="submit_val"> 
-        <button type="button" onclick="closeModal()">Cancel</button>
+        <button class="update-btn" type="button" onclick="closeModal()">Cancel</button>
     </div>
 </form>
 					
