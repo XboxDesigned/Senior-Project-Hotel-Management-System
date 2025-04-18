@@ -138,10 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_room']) && isset
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="'../../Website/inc/homepage_main.css'">
     <title>Book Room</title>
-    <style>
-
-    </style>
 </head>
 
 <body>
@@ -198,7 +196,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['book_room']) && isset
         <input type="date" name="checkout_date" id="checkout_date" placeholder="Select Check-out Date" required
                value="<?php echo isset($_POST['checkout_date']) ? htmlspecialchars($_POST['checkout_date']) : ''; ?>">
         
-        <button type="submit" name="book_room">Book Room</button>
+		<br>
+		
+        <button type="submit" name="book_room" class="book-button">Book Room</button>
 		<input type="hidden" name="submit_val"> 
     </form>
 
