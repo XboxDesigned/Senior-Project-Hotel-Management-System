@@ -87,7 +87,7 @@ $stmt->closeCursor();
                 <form method="post" style="display:inline;">
                     <input type="hidden" name="update_id" value="<?php echo $task['task_id']; ?>">
                     <input type="hidden" name="new_status" value="<?php echo $task['status'] === 'completed' ? 'in progress' : 'completed'; ?>">
-                    <button type="submit">
+                    <button class="task-btn" type="submit">
                         <?php echo $task['status'] === 'completed' ? 'Mark In Progress' : 'Mark Completed'; ?>
                     </button>
                 </form>
