@@ -196,9 +196,9 @@ try {
                 </div>
                 
                 <div class="filter-buttons">
-                    <button type="button" onclick="filterStaff('all')">All Staff</button>
-                    <button type="button" onclick="filterStaff('maintenance')">Maintenance Only</button>
-                    <button type="button" onclick="filterStaff('housekeeper')">Housekeeping Only</button>
+                    <button class="request-btn" type="button" onclick="filterStaff('all')">All Staff</button>
+                    <button class="request-btn" type="button" onclick="filterStaff('maintenance')">Maintenance Only</button>
+                    <button class="request-btn" type="button" onclick="filterStaff('housekeeper')">Housekeeping Only</button>
                 </div>
                 
                 <div class="form-group">
@@ -217,8 +217,8 @@ try {
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" onclick="closeMaintenanceModal()" class="btn btn-cancel">Cancel</button>
-                    <button type="submit" class="btn btn-submit">Submit Request</button>
+                    <button type="button" onclick="closeMaintenanceModal()" class="request-btn">Cancel</button>
+                    <button type="submit" class="request-btn">Submit Request</button>
                 </div>
             </form>
         </div>
