@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register_room'])) {
         <label>Rate Plan ($):</label>
         <input type="number" step="0.01" name="rate_plan" value="<?php echo htmlspecialchars($r_rate); ?>" required><br><br>
 
-        <button type="submit" name="register_room" style="padding: 12px 24px; font-size: 16px;">Add Room</button>
+        <button class="room-btn" type="submit" name="register_room">Add Room</button>
     </form>
 
     <!-- Back button -->
