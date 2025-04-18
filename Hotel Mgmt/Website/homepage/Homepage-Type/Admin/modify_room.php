@@ -83,8 +83,8 @@
              <td><?php echo $item['room_status']; ?></td>
              <td>$<?php echo number_format($item['rate_plan'], 2); ?></td>
              <td>
-                 <button><a href="?update_room_id=<?php echo $item['room_num']; ?>">Update Room</a></button>
-                 <button style="background-color:#dc3545;">
+                 <button class="modify-btn"><a href="?update_room_id=<?php echo $item['room_num']; ?>" style="color:white; text-decoration:none;">Update Room</a></button>
+                 <button class="modify-btn">
                      <a href="?delete_room_id=<?php echo $item['room_num']; ?>" style="color:white; text-decoration:none;">Delete Room</a>
                  </button>
              </td>
