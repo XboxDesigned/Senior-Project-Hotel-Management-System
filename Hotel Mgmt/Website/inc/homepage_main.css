@@ -291,7 +291,7 @@ table td {
     margin-bottom: 10px;
 }
 
-.table-button {
+.table-button, .book-button, .maintenance-btn, .task-btn, .register-btn, .update-btn, .room-btn, .modify-btn {
     background-color: #9887d5;
     color: white;
     border: none;
@@ -309,7 +309,7 @@ table td {
     background-color: #7a6bb2;
 }
 
-.table-button:active {
+.table-button:active{
     background-color: #5c4f8a;
 }
 
@@ -317,6 +317,61 @@ table td {
     margin-left: 5px;
 }
 
+.book-button:hover {
+    background-color: #7a6bb2;
+}
+
+.book-button:active {
+    background-color: #5c4f8a;
+}
+
+.maintenance-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.maintenance-btn:active {
+    background-color: #5c4f8a;
+}
+
+.task-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.task-btn:active {
+    background-color: #5c4f8a;
+}
+
+.register-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.register-btn:active {
+    background-color: #5c4f8a;
+}
+
+.update-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.update-btn:active {
+    background-color: #5c4f8a;
+}
+
+.room-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.room-btn:active {
+    background-color: #5c4f8a;
+}
+
+.modify-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.modify-btn:active {
+    background-color: #5c4f8a;
+}
 
 .book-room-form {
     position: relative;
