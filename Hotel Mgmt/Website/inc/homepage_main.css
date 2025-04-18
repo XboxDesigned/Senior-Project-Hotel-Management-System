@@ -291,7 +291,7 @@ table td {
     margin-bottom: 10px;
 }
 
-.table-button, .book-button, .maintenance-btn, .task-btn, .register-btn, .update-btn, .room-btn, .modify-btn {
+.table-button, .book-button, .maintenance-btn, .task-btn, .register-btn, .update-btn, .room-btn, .modify-btn, .request-btn, .charge-btn {
     background-color: #9887d5;
     color: white;
     border: none;
@@ -370,6 +370,22 @@ table td {
 }
 
 .modify-btn:active {
+    background-color: #5c4f8a;
+}
+
+.request-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.request-btn:active {
+    background-color: #5c4f8a;
+}
+
+.charge-btn:hover {
+    background-color: #7a6bb2;
+}
+
+.charge-btn:active {
     background-color: #5c4f8a;
 }
 
