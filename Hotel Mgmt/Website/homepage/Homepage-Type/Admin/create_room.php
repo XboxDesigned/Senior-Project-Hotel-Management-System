@@ -116,7 +116,7 @@ if (isset($db)) {
                 </select>
             </label><br>
             <label>Rate Plan ($): <input type="number" step="0.01" name="new_rate_plan" required></label><br>
-            <button type="submit" name="add_room">Add Room</button>
+            <button class="room-btn" type="submit" name="add_room">Add Room</button>
         </form>
     </div>
 
