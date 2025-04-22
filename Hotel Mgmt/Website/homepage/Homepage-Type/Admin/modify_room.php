@@ -26,48 +26,15 @@
      <title>Rooms</title>
      <link rel="stylesheet" type="text/css" href="../inc/homepage_main.css">
      <style>
-         td {
-             padding: 10px 20px;
-         }
- 
-         table {
-             margin-left: 220px;
-             width: 80%;
-             max-width: 1000px;
-             border-collapse: collapse;
-         }
- 
-         th, td {
-             padding: 12px;
-             border: 1px solid #ccc;
-             text-align: left;
-         }
- 
-         button {
-             margin-right: 5px;
-         }
- 
-         @media (max-width: 900px) {
-             table {
-                 width: 90%;
-                 margin-left: auto;
-                 margin-right: auto;
-                 overflow-x: auto;
-                 display: block;
-             }
-         }
+
      </style>
  </head>
  <main>
  <body>
-     <div id="data">
-         <h3>Room List:</h3>
-     </div>
-     <br>
      
  
- 
-     <table>
+     <div class="table-container">
+	<table border="1" id="rooms-table">
          <tr>
              <th>Room Number</th>
              <th>Room Type</th>
@@ -91,6 +58,7 @@
          </tr>
          <?php endforeach; ?>
      </table>
+	 </div>
  </body>
  </main>
  </html>
