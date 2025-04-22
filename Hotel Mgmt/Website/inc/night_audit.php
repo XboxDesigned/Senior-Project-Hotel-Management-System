@@ -6,12 +6,32 @@ if (!isset($db)) {
     die("Database connection not established.");
 }
 
+// Initialize message variable
+$audit_message = "";
+
+// Check if night audit has already run today
+$query = "SELECT run_date FROM night_audit_log WHERE run_date = CURDATE() LIMIT 1";
+$statement = $db->prepare($query);
+$statement->execute();
+$audit_ran = $statement->fetch(PDO::FETCH_ASSOC);
+$statement->closeCursor();
+
 // Run Night Audit when button is clicked
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !$audit_ran) {
     $query = "CALL night_audit()";
     $statement = $db->prepare($query);
     $statement->execute();
+    $result = $statement->fetchAll(PDO::FETCH_ASSOC);
     $statement->closeCursor();
+    
+    // Check if the procedure returned a message
+    if (!empty($result) && isset($result[0]['message'])) {
+        $audit_message = $result[0]['message'];
+    } else {
+        $audit_message = "Night audit completed successfully.";
+    }
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST" && $audit_ran) {
+    $audit_message = "Night audit already ran today.";
 }
 
 // Fetch Checked-Out Guests
@@ -68,6 +88,7 @@ $pending_tasks = array_merge($hk_tasks, $maint_tasks);
         th { background-color: #f2f2f2; }
         button { padding: 10px 15px; background: blue; color: white; border: none; cursor: pointer; margin: 10px 0; }
         button:hover { background: darkblue; }
+        .message { color: red; font-weight: bold; }
     </style>
     <script>
         function printReport() {
@@ -78,6 +99,10 @@ $pending_tasks = array_merge($hk_tasks, $maint_tasks);
 <body>
 
     <h2>Night Audit - End of Day Report</h2>
+    
+    <?php if ($audit_message) { ?>
+        <p class="message"><?= htmlspecialchars($audit_message) ?></p>
+    <?php } ?>
     
     <form method="POST">
         <button type="submit">Run Night Audit</button>
