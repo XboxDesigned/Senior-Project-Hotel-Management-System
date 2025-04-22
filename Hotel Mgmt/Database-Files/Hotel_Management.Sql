@@ -51,8 +51,8 @@ CREATE TABLE guest_charges (
     confirmation_num VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    date_added DATETIME DEFAULT CURRENT_TIMESTAMP, -- Added column
-    username VARCHAR(50) NOT NULL,                -- Added column
+    date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
+    username VARCHAR(50) NOT NULL,
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
     FOREIGN KEY (confirmation_num) REFERENCES reservations(confirmation_num) ON DELETE CASCADE
 );
@@ -65,8 +65,8 @@ CREATE TABLE invoices (
     total_amount DECIMAL(10,2) NOT NULL,
     payment_received DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    date_added DATETIME DEFAULT CURRENT_TIMESTAMP, -- Added column
-    username VARCHAR(50) NOT NULL,                -- Added column
+    date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
+    username VARCHAR(50) NOT NULL,
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id) ON DELETE CASCADE,
     FOREIGN KEY (confirmation_num) REFERENCES reservations(confirmation_num) ON DELETE CASCADE
 );
@@ -94,61 +94,65 @@ CREATE TABLE maintenance_tasks (
     FOREIGN KEY (assigned_to) REFERENCES users(u_id)
 );
 
--- Stored Procedure: night_audit()
+-- Table to track night audit runs
+CREATE TABLE night_audit_log (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    run_date DATE NOT NULL,
+    run_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+-- Stored Procedure: night_audit()
 DELIMITER //
 
 CREATE PROCEDURE night_audit()
 BEGIN
-    -- Create a temporary table for reservation updates
-    CREATE TEMPORARY TABLE temp_reservations AS 
-    SELECT guest_id, confirmation_num, room_num, balance, status, checkin_date 
-    FROM reservations;
+    -- Check if night audit has already run today
+    DECLARE last_run DATE;
+    SELECT run_date INTO last_run 
+    FROM night_audit_log 
+    WHERE run_date = CURDATE()
+    LIMIT 1;
 
-    -- 1. Charge guests for each night stayed under 'System' (matching in_house.php format)
-    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount, username, date_added)
-    SELECT t.guest_id, t.confirmation_num, 'Nightly Room Charge', rm.rate_plan, 'System', NOW()
-    FROM temp_reservations t
-    JOIN rooms rm ON t.room_num = rm.room_num
-    WHERE t.status = 'checked-in';
+    IF last_run IS NULL THEN
+        -- Log the night audit run
+        INSERT INTO night_audit_log (run_date) VALUES (CURDATE());
 
-    -- 2. Charge no-shows under 'System' (matching in_house.php format)
-    INSERT INTO guest_charges (guest_id, confirmation_num, description, amount, username, date_added)
-    SELECT t.guest_id, t.confirmation_num, 'No-Show Fee', rm.rate_plan, 'System', NOW()
-    FROM temp_reservations t
-    JOIN rooms rm ON t.room_num = rm.room_num
-    WHERE t.checkin_date = CURDATE() AND t.status = 'no-show';
+        -- Create a temporary table for reservation updates
+        CREATE TEMPORARY TABLE temp_reservations AS 
+        SELECT guest_id, confirmation_num, room_num, balance, status, checkin_date 
+        FROM reservations;
 
-    -- 3. Mark rooms as pending for housekeeping
-    UPDATE rooms
-    SET room_status = 'pending'
-    WHERE room_num IN (
-        SELECT room_num FROM reservations
-        WHERE (checkout_date = CURDATE() OR DATE(checkout_datetime) = CURDATE())
-        AND status = 'checked-out'
-    );
+        -- Mark rooms as pending for housekeeping
+        UPDATE rooms
+        SET room_status = 'pending'
+        WHERE room_num IN (
+            SELECT room_num FROM reservations
+            WHERE (checkout_date = CURDATE() OR DATE(checkout_datetime) = CURDATE())
+            AND status = 'checked-out'
+        );
 
-    -- 4. Generate High Balance Report (this SELECT returns the result set to the caller)
-    SELECT t.confirmation_num, t.guest_id, g.first_name, g.last_name, t.room_num, t.balance
-    FROM temp_reservations t
-    JOIN guests g ON t.guest_id = g.guest_id
-    WHERE t.balance > 100;
+        -- Generate High Balance Report (this SELECT returns the result set to the caller)
+        SELECT t.confirmation_num, t.guest_id, g.first_name, g.last_name, t.room_num, t.balance
+        FROM temp_reservations t
+        JOIN guests g ON t.guest_id = g.guest_id
+        WHERE t.balance > 100;
 
-    -- Drop the temporary table after use
-    DROP TEMPORARY TABLE IF EXISTS temp_reservations;
+        -- Drop the temporary table after use
+        DROP TEMPORARY TABLE IF EXISTS temp_reservations;
+    ELSE
+        -- Return an empty result set if audit already ran
+        SELECT 'Night audit already ran today' AS message;
+    END IF;
 END //
 
 DELIMITER ;
 
-
 -- Drop existing triggers (if any) to replace them
-
 DROP TRIGGER IF EXISTS after_guest_charge_insert;
 DROP TRIGGER IF EXISTS after_guest_charge_delete;
 DROP TRIGGER IF EXISTS after_guest_charge_update;
 DROP TRIGGER IF EXISTS after_invoice_insert;
 DROP TRIGGER IF EXISTS after_invoice_delete;
-
 
 -- Trigger: After Inserting a Guest Charge
 DELIMITER $$
@@ -245,9 +249,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-
 -- View: Check for Balance Mismatches
-
 DROP VIEW IF EXISTS balance_mismatch;
 CREATE VIEW balance_mismatch AS
 SELECT 
@@ -265,12 +267,11 @@ SELECT
 FROM reservations r
 HAVING recorded_balance <> computed_balance;
 
-
 -- Insert user
--- all user passwords are ''password''
+-- all user passwords are 'password'
 INSERT INTO users (username, password, role) VALUES 
 ('Nicholas Frischkorn', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'), 
-('Mark Feick', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'), -- hashed password is "admin"
+('Mark Feick', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
 ('Lyubomir Dimitrov', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
 ('Skyler Dipofi', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
 ('Michael Anderson', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'admin'),
@@ -283,16 +284,13 @@ INSERT INTO users (username, password, role) VALUES
 ('Front_Desk', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'front_desk'),
 ('Housekeeping', '$2y$10$fQE/77itaIWy3k5b/jCiRex7V.Y7pnNJDMlt2vllClWIqT3ezC4hS', 'housekeeper');
 
-
-
--- Insert  guests
+-- Insert guests
 INSERT INTO guests (first_name, last_name, contact_num, email_address) VALUES
 ('John', 'Doe', '555-1234', 'johndoe@example.com'),
 ('Jane', 'Smith', '555-5678', 'janesmith@example.com'),
 ('Alice', 'Johnson', '555-8765', 'alicej@example.com'),
 ('Robert', 'Brown', '555-4321', 'robertbrown@example.com'),
 ('Emily', 'Davis', '555-6789', 'emilydavis@example.com');
-
 
 -- Insert hotel rooms (01-25 on each floor)
 INSERT INTO rooms (room_num, room_type, room_status, rate_plan) VALUES
@@ -440,7 +438,6 @@ VALUES
 ('CNF1004', 4, 401, '2025-03-05', '2025-02-13', '2025-02-13 15:30:00', 'confirmed', 800.00),
 ('CNF1005', 5, 501, '2025-01-15', '2025-02-12', NULL, 'checked-in', 0.00);
 
-
 -- Insert sample housekeeping tasks 
 INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status) VALUES
 (501, 1, 'Clean room and replace linens', 'pending'), 
@@ -449,6 +446,6 @@ INSERT INTO housekeeping_tasks (room_num, assigned_to, task_description, status)
 (401, 1, 'Vacuum carpets and dust furniture', 'pending'),
 (222, 1, 'Sanitize high-touch surfaces', 'completed');
 
+-- Insert sample maintenance tasks
 INSERT INTO maintenance_tasks (room_num, assigned_to, task_description, status) VALUES
 (501, 11, 'Fix the broken door', 'pending');
-
