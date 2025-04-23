@@ -92,6 +92,8 @@ else
         <button type="submit" name="book_room" id="side-buttons">Book Room</button>
     </form>
 	
+ <form method="post"><button type="submit" name="modify" id="side-buttons">Modify Reservation</button></form>
+	
 	<form method="post">
         <button type="submit" name="check_in" id="side-buttons">Check In</button>
     </form>
