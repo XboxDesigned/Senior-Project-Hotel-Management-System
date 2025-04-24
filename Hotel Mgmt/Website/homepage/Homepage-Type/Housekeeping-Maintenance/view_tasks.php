@@ -20,22 +20,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id']) && isset
     $new_status = $_POST['new_status'] === 'completed' ? 'completed' : 'in progress';
 
     if ($task_id) {
+        // Determine table based on role
         if ($role === 'maintenance') {
-            $queryUpdate = "UPDATE maintenance_tasks SET status = :new_status WHERE task_id = :task_id AND assigned_to = :user_id";
+            $task_table = 'maintenance_tasks';
         } elseif ($role === 'housekeeper') {
-            $queryUpdate = "UPDATE housekeeping_tasks SET status = :new_status WHERE task_id = :task_id AND assigned_to = :user_id";
+            $task_table = 'housekeeping_tasks';
         } else {
             die("Unauthorized access.");
         }
 
-        $stmt = $db->prepare($queryUpdate);
-        $stmt->bindValue(':new_status', $new_status, PDO::PARAM_STR);
+        // Get the room number associated with the task
+        $queryRoom = "SELECT room_num FROM $task_table WHERE task_id = :task_id AND assigned_to = :user_id";
+        $stmt = $db->prepare($queryRoom);
         $stmt->bindValue(':task_id', $task_id, PDO::PARAM_INT);
         $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
+        $room = $stmt->fetchColumn();
         $stmt->closeCursor();
+
+        if ($room) {
+            // Update task status
+            $queryUpdate = "UPDATE $task_table SET status = :new_status WHERE task_id = :task_id AND assigned_to = :user_id";
+            $stmt = $db->prepare($queryUpdate);
+            $stmt->bindValue(':new_status', $new_status, PDO::PARAM_STR);
+            $stmt->bindValue(':task_id', $task_id, PDO::PARAM_INT);
+            $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->closeCursor();
+
+            // Update room status accordingly
+            $room_status = $new_status === 'completed' ? 'available' : 'in-progress';
+            $queryRoomUpdate = "UPDATE rooms SET room_status = :room_status WHERE room_num = :room_num";
+            $stmt = $db->prepare($queryRoomUpdate);
+            $stmt->bindValue(':room_status', $room_status, PDO::PARAM_STR);
+            $stmt->bindValue(':room_num', $room, PDO::PARAM_INT);
+            $stmt->execute();
+            $stmt->closeCursor();
+        }
     }
 }
+
 
 // Fetch tasks
 if ($role === 'maintenance') {
