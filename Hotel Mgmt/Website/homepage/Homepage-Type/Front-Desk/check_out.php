@@ -8,8 +8,7 @@ $success_message = '';
 $guests = $db->query("SELECT g.guest_id, g.first_name, g.last_name, r.room_num 
                       FROM guests g 
                       JOIN reservations r ON g.guest_id = r.guest_id
-                      WHERE r.status != 'checked-out'
-					  AND r.status != 'cancelled'")
+                      WHERE r.status = 'checked-in'")
               ->fetchAll(PDO::FETCH_ASSOC);
 
 if (isset($_POST['check_out']) && isset($_POST['guest_id']) && isset($_POST['room_num'])) {
@@ -43,12 +42,11 @@ if (isset($_POST['check_out']) && isset($_POST['guest_id']) && isset($_POST['roo
             $success_message = 'Guest successfully checked out and room made available.';
             
             // Refresh guest list
-            $guests = $db->query("SELECT g.guest_id, g.first_name, g.last_name, r.room_num 
-                                 FROM guests g 
-                                 JOIN reservations r ON g.guest_id = r.guest_id
-                                 WHERE r.status != 'checked-out'
-								 AND r.status != 'cancelled'")
-                         ->fetchAll(PDO::FETCH_ASSOC);
+			$guests = $db->query("SELECT g.guest_id, g.first_name, g.last_name, r.room_num 
+                      FROM guests g 
+                      JOIN reservations r ON g.guest_id = r.guest_id
+                      WHERE r.status = 'checked-in'")
+              ->fetchAll(PDO::FETCH_ASSOC);
         } else {
             $error_message = 'Selected guest not found.';
             $db->rollBack();
